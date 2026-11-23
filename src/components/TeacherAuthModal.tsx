@@ -1,25 +1,55 @@
-import { useState, type FormEvent } from 'react';
+import { useEffect, useState, type FormEvent } from 'react';
 import { Eye, EyeOff, KeyRound, Lock, ShieldCheck, X } from 'lucide-react';
 import type { AuthStatus } from '../types.ts';
 
 interface TeacherLoginFormProps {
   authStatus: AuthStatus;
-  onAuthenticated: (token: string) => void;
+  onStatusChange?: (next: AuthStatus) => void;
+  onAuthenticated: (token: string) => void | Promise<void>;
   onCancel?: () => void;
 }
 
 export function TeacherLoginForm({
   authStatus,
+  onStatusChange,
   onAuthenticated,
   onCancel,
 }: TeacherLoginFormProps) {
+  const [liveStatus, setLiveStatus] = useState<AuthStatus>(authStatus);
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const isFirstSetup = !authStatus.configured && !authStatus.envManaged;
+  useEffect(() => {
+    setLiveStatus(authStatus);
+  }, [authStatus]);
+
+  useEffect(() => {
+    let active = true;
+    async function syncStatus() {
+      try {
+        const res = await fetch('/api/auth/status', { cache: 'no-store' });
+        const contentType = res.headers.get('content-type') || '';
+        if (res.ok && contentType.includes('application/json')) {
+          const st = (await res.json()) as AuthStatus;
+          if (active) {
+            setLiveStatus(st);
+            onStatusChange?.(st);
+          }
+        }
+      } catch {
+        // Keep current status if offline
+      }
+    }
+    void syncStatus();
+    return () => {
+      active = false;
+    };
+  }, [onStatusChange]);
+
+  const isFirstSetup = !liveStatus.configured && !liveStatus.envManaged;
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -46,16 +76,32 @@ export function TeacherLoginForm({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ password }),
       });
-      const data = (await res.json().catch(() => ({}))) as { token?: string; error?: string };
-      if (!res.ok || !data.token) {
-        setError(data.error || 'No se pudo validar el acceso docente.');
+
+      const contentType = res.headers.get('content-type') || '';
+      if (!contentType.includes('application/json')) {
+        if (res.status === 502 || res.status === 503 || res.status === 504) {
+          setError(
+            `El servidor se está iniciando o reiniciando (HTTP ${res.status}). Espera 5 segundos y vuelve a intentar.`
+          );
+        } else {
+          setError(
+            `El servidor de autenticación no respondió en formato válido (HTTP ${res.status}). Recarga la página e intenta desde la vista activa de la aplicación.`
+          );
+        }
         return;
       }
+
+      const data = (await res.json().catch(() => ({}))) as { token?: string; error?: string };
+      if (!res.ok || !data.token) {
+        setError(data.error || `No se pudo validar el acceso docente (HTTP ${res.status}).`);
+        return;
+      }
+
       setPassword('');
       setConfirmPassword('');
-      onAuthenticated(data.token);
+      await onAuthenticated(data.token);
     } catch {
-      setError('Error de conexión con el servidor. Intenta de nuevo.');
+      setError('Error de conexión con el servidor. Verifica tu conexión e intenta de nuevo.');
     } finally {
       setLoading(false);
     }
@@ -114,9 +160,16 @@ export function TeacherLoginForm({
 
       <div className="flex items-start gap-2 rounded-lg border border-[#DCE5DD] bg-[#F7FAF7] px-3 py-2.5 text-xs text-[#4B6153]">
         <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-[#166534]" />
-        <span>
-          La verificación se realiza en el servidor. Ninguna clave ni pista se muestra en pantalla.
-        </span>
+        <div className="space-y-1">
+          <div>
+            La verificación se realiza en el servidor. Ninguna clave ni pista se muestra en pantalla.
+          </div>
+          {liveStatus.envManaged && (
+            <div className="font-medium text-[#14532D]">
+              Clave administrada desde Secretos del servidor (TEACHER_PASSCODE).
+            </div>
+          )}
+        </div>
       </div>
 
       <div className="flex items-center justify-end gap-2.5 pt-1">
@@ -149,13 +202,15 @@ export function TeacherLoginForm({
 interface TeacherAuthModalProps {
   open: boolean;
   authStatus: AuthStatus;
+  onStatusChange?: (next: AuthStatus) => void;
   onClose: () => void;
-  onAuthenticated: (token: string) => void;
+  onAuthenticated: (token: string) => void | Promise<void>;
 }
 
 export function TeacherAuthModal({
   open,
   authStatus,
+  onStatusChange,
   onClose,
   onAuthenticated,
 }: TeacherAuthModalProps) {
@@ -199,9 +254,10 @@ export function TeacherAuthModal({
 
         <TeacherLoginForm
           authStatus={authStatus}
+          onStatusChange={onStatusChange}
           onCancel={onClose}
-          onAuthenticated={(token) => {
-            onAuthenticated(token);
+          onAuthenticated={async (token) => {
+            await onAuthenticated(token);
             onClose();
           }}
         />

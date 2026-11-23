@@ -489,6 +489,7 @@ export default function App() {
                     </div>
                     <TeacherLoginForm
                       authStatus={authStatus}
+                      onStatusChange={setAuthStatus}
                       onAuthenticated={handleAuthenticated}
                     />
                   </div>
@@ -515,6 +516,7 @@ export default function App() {
       <TeacherAuthModal
         open={authModalOpen}
         authStatus={authStatus}
+        onStatusChange={setAuthStatus}
         onClose={() => setAuthModalOpen(false)}
         onAuthenticated={handleAuthenticated}
       />

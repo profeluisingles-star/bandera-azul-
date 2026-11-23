@@ -25,6 +25,7 @@ const DB_PATH = path.join(DATA_DIR, 'ecotron-platform.json');
 const AUTH_PATH = path.join(DATA_DIR, 'teacher-auth.json');
 
 interface StoredAuth {
+  mode?: 'active' | 'pending_reset';
   salt: string;
   hash: string;
   createdAt: string;
@@ -101,8 +102,17 @@ function loadStoredAuth(): StoredAuth | null {
   try {
     const raw = fs.readFileSync(AUTH_PATH, 'utf8');
     const parsed = JSON.parse(raw) as Partial<StoredAuth>;
-    if (typeof parsed.salt === 'string' && typeof parsed.hash === 'string') {
+    if (parsed.mode === 'pending_reset') {
       return {
+        mode: 'pending_reset',
+        salt: '',
+        hash: '',
+        createdAt: typeof parsed.createdAt === 'string' ? parsed.createdAt : new Date().toISOString(),
+      };
+    }
+    if (typeof parsed.salt === 'string' && typeof parsed.hash === 'string' && parsed.salt && parsed.hash) {
+      return {
+        mode: 'active',
         salt: parsed.salt,
         hash: parsed.hash,
         createdAt: typeof parsed.createdAt === 'string' ? parsed.createdAt : new Date().toISOString(),
@@ -121,30 +131,40 @@ function hashPassword(password: string, saltHex?: string): { salt: string; hash:
 }
 
 function verifyPassword(password: string): boolean {
+  const stored = loadStoredAuth();
+  if (stored?.mode === 'pending_reset') {
+    return false;
+  }
+  if (stored && stored.salt && stored.hash) {
+    const candidate = crypto.scryptSync(password, stored.salt, 64);
+    const expected = Buffer.from(stored.hash, 'hex');
+    if (candidate.length !== expected.length) {
+      return false;
+    }
+    return crypto.timingSafeEqual(candidate, expected);
+  }
   const envPass = getEnvPasscode();
   if (envPass.length > 0) {
     const a = crypto.createHash('sha256').update(password).digest();
     const b = crypto.createHash('sha256').update(envPass).digest();
     return crypto.timingSafeEqual(a, b);
   }
-  const stored = loadStoredAuth();
-  if (!stored) {
-    return false;
-  }
-  const candidate = crypto.scryptSync(password, stored.salt, 64);
-  const expected = Buffer.from(stored.hash, 'hex');
-  if (candidate.length !== expected.length) {
-    return false;
-  }
-  return crypto.timingSafeEqual(candidate, expected);
+  return false;
 }
 
 function isAuthConfigured(): { configured: boolean; envManaged: boolean } {
+  const stored = loadStoredAuth();
+  if (stored?.mode === 'pending_reset') {
+    return { configured: false, envManaged: false };
+  }
+  if (stored && stored.salt && stored.hash) {
+    return { configured: true, envManaged: false };
+  }
   const envPass = getEnvPasscode();
   if (envPass.length > 0) {
     return { configured: true, envManaged: true };
   }
-  return { configured: loadStoredAuth() !== null, envManaged: false };
+  return { configured: false, envManaged: false };
 }
 
 function createSession(): string {
@@ -237,6 +257,7 @@ function isSafeImageSrc(value: unknown): boolean {
 
 async function startServer(): Promise<void> {
   const app = express();
+  app.set('trust proxy', 1);
   app.disable('x-powered-by');
   app.use(express.json({ limit: '4mb' }));
 
@@ -263,18 +284,26 @@ async function startServer(): Promise<void> {
       return;
     }
     ensureDataDir();
+    const existing = loadStoredAuth();
     const { salt, hash } = hashPassword(password);
     const payload: StoredAuth = {
+      mode: 'active',
       salt,
       hash,
       createdAt: new Date().toISOString(),
     };
-    try {
-      fs.writeFileSync(AUTH_PATH, JSON.stringify(payload, null, 2), { flag: 'wx', encoding: 'utf8' });
-    } catch {
-      res.status(409).json({ error: 'La clave docente ya fue establecida.' });
-      return;
+    if (existing?.mode === 'pending_reset') {
+      writeJsonAtomic(AUTH_PATH, payload);
+    } else {
+      try {
+        fs.writeFileSync(AUTH_PATH, JSON.stringify(payload, null, 2), { flag: 'wx', encoding: 'utf8' });
+      } catch {
+        res.status(409).json({ error: 'La clave docente ya fue establecida.' });
+        return;
+      }
     }
+    sessions.clear();
+    loginAttempts.clear();
     const token = createSession();
     res.status(201).json({ token, configured: true, envManaged: false, authenticated: true });
   });
@@ -330,6 +359,7 @@ async function startServer(): Promise<void> {
     }
     const { salt, hash } = hashPassword(newPassword);
     writeJsonAtomic(AUTH_PATH, {
+      mode: 'active',
       salt,
       hash,
       createdAt: new Date().toISOString(),
@@ -895,9 +925,14 @@ async function startServer(): Promise<void> {
     res.json(platformDb);
   });
 
-  // API 404 fallback
+  // API 404 & JSON error fallbacks
   app.use('/api', (_req: Request, res: Response) => {
     res.status(404).json({ error: 'Ruta API no encontrada.' });
+  });
+
+  app.use('/api', (err: unknown, _req: Request, res: Response, _next: NextFunction) => {
+    console.error('API error:', err);
+    res.status(500).json({ error: 'Error interno en el servidor al procesar la solicitud.' });
   });
 
   if (process.env.NODE_ENV !== 'production') {
