@@ -22,6 +22,12 @@ import type {
   Sowing,
 } from './types.ts';
 import { createInitialPlatformData } from './data/defaultCatalog.ts';
+import {
+  adminApiRequest,
+  fetchAuthStatus,
+  fetchPublicPlatformData,
+  logoutTeacher,
+} from './utils/apiClient.ts';
 import { LogoStrip } from './components/LogoStrip.tsx';
 import { ProductStudioModal } from './components/ProductStudioModal.tsx';
 import { TeacherAuthModal, TeacherLoginForm } from './components/TeacherAuthModal.tsx';
@@ -66,18 +72,14 @@ export default function App() {
   const loadInitialState = useCallback(async () => {
     setLoading(true);
     try {
-      const [pubRes, statusRes] = await Promise.all([
-        fetch('/api/public/data'),
-        fetch('/api/auth/status'),
+      const [pub, st] = await Promise.all([
+        fetchPublicPlatformData(),
+        fetchAuthStatus(),
       ]);
-      if (pubRes.ok) {
-        const pub = (await pubRes.json()) as PublicPlatformData;
+      if (pub) {
         setPublicData(pub);
       }
-      if (statusRes.ok) {
-        const st = (await statusRes.json()) as AuthStatus;
-        setAuthStatus(st);
-      }
+      setAuthStatus(st);
     } catch {
       // Keep fallback seed state if network temporarily unavailable
     } finally {
@@ -93,33 +95,23 @@ export default function App() {
     setAuthToken(token);
     setAuthStatus((prev) => ({ ...prev, configured: true, authenticated: true }));
     try {
-      const res = await fetch('/api/admin/data', {
-        headers: { Authorization: `Bearer ${token}` },
+      const full = await adminApiRequest<PlatformData>('/api/admin/data', { method: 'GET' }, token);
+      setAdminData(full);
+      setPublicData({
+        products: full.products,
+        sowings: full.sowings,
+        fieldLogs: full.fieldLogs,
+        customReminders: full.customReminders || [],
+        settings: full.settings,
       });
-      if (res.ok) {
-        const full = (await res.json()) as PlatformData;
-        setAdminData(full);
-        setPublicData({
-          products: full.products,
-          sowings: full.sowings,
-          fieldLogs: full.fieldLogs,
-          customReminders: full.customReminders || [],
-          settings: full.settings,
-        });
-        setSection('docente');
-      }
+      setSection('docente');
     } catch {
       // Handled gracefully
     }
   }, []);
 
   async function handleLogout() {
-    if (authToken) {
-      await fetch('/api/auth/logout', {
-        method: 'POST',
-        headers: { Authorization: `Bearer ${authToken}` },
-      }).catch(() => {});
-    }
+    await logoutTeacher(authToken);
     setAuthToken('');
     setAdminData(null);
     setAuthStatus((prev) => ({ ...prev, authenticated: false }));
@@ -141,105 +133,76 @@ export default function App() {
 
   async function refreshAdminAndPublic() {
     if (!authToken) return;
-    const res = await fetch('/api/admin/data', {
-      headers: { Authorization: `Bearer ${authToken}` },
-    });
-    if (res.ok) {
-      const full = (await res.json()) as PlatformData;
-      handleAdminDataChange(full);
-    }
+    const full = await adminApiRequest<PlatformData>('/api/admin/data', { method: 'GET' }, authToken);
+    handleAdminDataChange(full);
   }
 
   async function handleAddSowing(sowing: Omit<Sowing, 'id' | 'completedTasks'>) {
     if (!authToken) return;
-    const res = await fetch('/api/admin/sowings', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${authToken}`,
-      },
-      body: JSON.stringify(sowing),
-    });
-    if (res.ok) await refreshAdminAndPublic();
+    await adminApiRequest(
+      '/api/admin/sowings',
+      { method: 'POST', body: JSON.stringify(sowing) },
+      authToken
+    );
+    await refreshAdminAndPublic();
   }
 
   async function handleToggleSowingTask(sowingId: string, taskId: string) {
     if (!authToken) return;
-    const res = await fetch(`/api/admin/sowings/${sowingId}/tasks`, {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${authToken}`,
-      },
-      body: JSON.stringify({ taskId }),
-    });
-    if (res.ok) await refreshAdminAndPublic();
+    await adminApiRequest(
+      `/api/admin/sowings/${sowingId}/tasks`,
+      { method: 'PATCH', body: JSON.stringify({ taskId }) },
+      authToken
+    );
+    await refreshAdminAndPublic();
   }
 
   async function handleDeleteSowing(sowingId: string) {
     if (!authToken) return;
-    const res = await fetch(`/api/admin/sowings/${sowingId}`, {
-      method: 'DELETE',
-      headers: { Authorization: `Bearer ${authToken}` },
-    });
-    if (res.ok) await refreshAdminAndPublic();
+    await adminApiRequest(`/api/admin/sowings/${sowingId}`, { method: 'DELETE' }, authToken);
+    await refreshAdminAndPublic();
   }
 
   async function handleAddFieldLog(entry: Omit<FieldLog, 'id'>) {
     if (!authToken) return;
-    const res = await fetch('/api/admin/field-logs', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${authToken}`,
-      },
-      body: JSON.stringify(entry),
-    });
-    if (res.ok) await refreshAdminAndPublic();
+    await adminApiRequest(
+      '/api/admin/field-logs',
+      { method: 'POST', body: JSON.stringify(entry) },
+      authToken
+    );
+    await refreshAdminAndPublic();
   }
 
   async function handleDeleteFieldLog(id: string) {
     if (!authToken) return;
-    const res = await fetch(`/api/admin/field-logs/${id}`, {
-      method: 'DELETE',
-      headers: { Authorization: `Bearer ${authToken}` },
-    });
-    if (res.ok) await refreshAdminAndPublic();
+    await adminApiRequest(`/api/admin/field-logs/${id}`, { method: 'DELETE' }, authToken);
+    await refreshAdminAndPublic();
   }
 
   async function handleAddReminder(rem: Omit<CustomReminder, 'id' | 'done'>) {
     if (!authToken) return;
-    const res = await fetch('/api/admin/reminders', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${authToken}`,
-      },
-      body: JSON.stringify(rem),
-    });
-    if (res.ok) await refreshAdminAndPublic();
+    await adminApiRequest(
+      '/api/admin/reminders',
+      { method: 'POST', body: JSON.stringify(rem) },
+      authToken
+    );
+    await refreshAdminAndPublic();
   }
 
   async function handleToggleReminder(id: string, done: boolean) {
     if (!authToken) return;
-    const res = await fetch(`/api/admin/reminders/${id}`, {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${authToken}`,
-      },
-      body: JSON.stringify({ done }),
-    });
-    if (res.ok) await refreshAdminAndPublic();
+    await adminApiRequest(
+      `/api/admin/reminders/${id}`,
+      { method: 'PATCH', body: JSON.stringify({ done }) },
+      authToken
+    );
+    await refreshAdminAndPublic();
   }
 
   async function handleDeleteReminder(id: string) {
     if (!authToken) return;
-    const res = await fetch(`/api/admin/reminders/${id}`, {
-      method: 'DELETE',
-      headers: { Authorization: `Bearer ${authToken}` },
-    });
-    if (res.ok) await refreshAdminAndPublic();
+    await adminApiRequest(`/api/admin/reminders/${id}`, { method: 'DELETE' }, authToken);
+    await refreshAdminAndPublic();
   }
 
   const activeSettings = adminData?.settings || publicData.settings;

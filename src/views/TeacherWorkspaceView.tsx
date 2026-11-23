@@ -37,6 +37,7 @@ import {
   formatDateCR,
   totalProductStock,
 } from '../utils/format.ts';
+import { adminApiRequest } from '../utils/apiClient.ts';
 import { ReceiptModal } from '../components/ReceiptModal.tsx';
 
 type AdminTab = 'resumen' | 'ventas' | 'productos' | 'inventario' | 'clientes' | 'ajustes';
@@ -208,19 +209,7 @@ export function TeacherWorkspaceView({
   }, [data]);
 
   async function apiCall<T>(url: string, options: RequestInit = {}): Promise<T> {
-    const res = await fetch(url, {
-      ...options,
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${authToken}`,
-        ...(options.headers || {}),
-      },
-    });
-    const body = (await res.json().catch(() => ({}))) as T & { error?: string };
-    if (!res.ok) {
-      throw new Error(body.error || 'Error al guardar en el servidor.');
-    }
-    return body;
+    return adminApiRequest<T>(url, options, authToken);
   }
 
   async function refreshFullData() {

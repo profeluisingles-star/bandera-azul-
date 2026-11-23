@@ -1,6 +1,7 @@
 import { useEffect, useState, type FormEvent } from 'react';
 import { Eye, EyeOff, KeyRound, Lock, ShieldCheck, X } from 'lucide-react';
 import type { AuthStatus } from '../types.ts';
+import { fetchAuthStatus, getBackendMode, submitAuthRequest } from '../utils/apiClient.ts';
 
 interface TeacherLoginFormProps {
   authStatus: AuthStatus;
@@ -21,6 +22,7 @@ export function TeacherLoginForm({
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [isLocalMode, setIsLocalMode] = useState(getBackendMode() === 'local');
 
   useEffect(() => {
     setLiveStatus(authStatus);
@@ -29,18 +31,11 @@ export function TeacherLoginForm({
   useEffect(() => {
     let active = true;
     async function syncStatus() {
-      try {
-        const res = await fetch('/api/auth/status', { cache: 'no-store' });
-        const contentType = res.headers.get('content-type') || '';
-        if (res.ok && contentType.includes('application/json')) {
-          const st = (await res.json()) as AuthStatus;
-          if (active) {
-            setLiveStatus(st);
-            onStatusChange?.(st);
-          }
-        }
-      } catch {
-        // Keep current status if offline
+      const st = await fetchAuthStatus();
+      if (active) {
+        setLiveStatus(st);
+        setIsLocalMode(getBackendMode() === 'local');
+        onStatusChange?.(st);
       }
     }
     void syncStatus();
@@ -70,38 +65,18 @@ export function TeacherLoginForm({
 
     setLoading(true);
     try {
-      const endpoint = isFirstSetup ? '/api/auth/setup' : '/api/auth/login';
-      const res = await fetch(endpoint, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ password }),
-      });
-
-      const contentType = res.headers.get('content-type') || '';
-      if (!contentType.includes('application/json')) {
-        if (res.status === 502 || res.status === 503 || res.status === 504) {
-          setError(
-            `El servidor se está iniciando o reiniciando (HTTP ${res.status}). Espera 5 segundos y vuelve a intentar.`
-          );
-        } else {
-          setError(
-            `El servidor de autenticación no respondió en formato válido (HTTP ${res.status}). Recarga la página e intenta desde la vista activa de la aplicación.`
-          );
-        }
-        return;
-      }
-
-      const data = (await res.json().catch(() => ({}))) as { token?: string; error?: string };
-      if (!res.ok || !data.token) {
-        setError(data.error || `No se pudo validar el acceso docente (HTTP ${res.status}).`);
-        return;
-      }
-
+      const result = await submitAuthRequest(isFirstSetup, password);
+      setIsLocalMode(getBackendMode() === 'local');
+      onStatusChange?.(result.authStatus);
       setPassword('');
       setConfirmPassword('');
-      await onAuthenticated(data.token);
-    } catch {
-      setError('Error de conexión con el servidor. Verifica tu conexión e intenta de nuevo.');
+      await onAuthenticated(result.token);
+    } catch (err) {
+      setIsLocalMode(getBackendMode() === 'local');
+      const latest = await fetchAuthStatus();
+      setLiveStatus(latest);
+      onStatusChange?.(latest);
+      setError(err instanceof Error ? err.message : 'No se pudo validar el acceso docente.');
     } finally {
       setLoading(false);
     }
@@ -162,11 +137,16 @@ export function TeacherLoginForm({
         <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-[#166534]" />
         <div className="space-y-1">
           <div>
-            La verificación se realiza en el servidor. Ninguna clave ni pista se muestra en pantalla.
+            Ninguna clave ni pista se muestra en pantalla.
           </div>
           {liveStatus.envManaged && (
             <div className="font-medium text-[#14532D]">
               Clave administrada desde Secretos del servidor (TEACHER_PASSCODE).
+            </div>
+          )}
+          {isLocalMode && (
+            <div className="font-medium text-[#14532D]">
+              Modo navegador autónomo: la clave cifrada y tus registros se guardan de forma segura en este navegador.
             </div>
           )}
         </div>
