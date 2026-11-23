@@ -1,0 +1,6 @@
+{
+  "name": "ECOTRON · CTP Tronadora · Huerta 2027",
+  "description": "Plataforma agroecológica educativa y sistema de gestión ECOTRON del CTP Tronadora, Tilarán, Guanacaste (Bandera Azul Ecológica): Aprende con Luisito, cultivos de Tilarán, compostaje, catálogo comercial en sacos y botellas reutilizadas y acceso docente seguro.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
