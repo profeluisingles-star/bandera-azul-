@@ -34,17 +34,17 @@ export function CompostLibraryView() {
   }, [libCategory, libSearch]);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       {/* Compost Calculator */}
-      <section className="rounded-xl border border-[#DCE5DD] bg-white p-6">
+      <section className="rounded-2xl border border-[#D9E2D7] bg-white p-6 shadow-xs sm:p-8">
         <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#166534]">
           <Calculator className="h-4 w-4" />
           Calculadora de Compost y Sacos para Eras
         </div>
-        <h1 className="mt-1 text-2xl font-extrabold text-[#14241B]">
+        <h1 className="font-display mt-1.5 text-2xl font-bold text-[#14241B] sm:text-3xl">
           Compostaje, Sustratos y Biblioteca Agroecológica
         </h1>
-        <p className="mt-1 text-sm text-[#33473B]">
+        <p className="mt-2 max-w-3xl text-sm leading-relaxed text-[#33473B]">
           Calcula cuántos kilos y sacos de TierraViva, VermiVida o BokaSuelo necesitas para preparar las eras antes
           de sembrar.
         </p>
@@ -129,15 +129,15 @@ export function CompostLibraryView() {
       </section>
 
       {/* 4 Compost Recipes */}
-      <section className="space-y-3">
+      <section className="space-y-4">
         <div className="flex items-center gap-2 px-1">
           <Layers className="h-5 w-5 text-[#166534]" />
-          <h2 className="text-xl font-bold text-[#14241B]">Recetas de Compostaje y Sustratos</h2>
+          <h2 className="font-display text-2xl font-bold text-[#14241B]">Recetas de Compostaje y Sustratos</h2>
         </div>
 
-        <div className="grid gap-4 md:grid-cols-2">
+        <div className="grid gap-5 md:grid-cols-2">
           {COMPOST_RECIPES.map((rec) => (
-            <article key={rec.id} className="rounded-xl border border-[#DCE5DD] bg-white p-5">
+            <article key={rec.id} className="rounded-2xl border border-[#D9E2D7] bg-white p-6 shadow-xs">
               <div className="flex items-start justify-between gap-2">
                 <div>
                   <div className="text-[11px] font-bold uppercase tracking-wider text-[#166534]">
@@ -188,15 +188,15 @@ export function CompostLibraryView() {
       </section>
 
       {/* Biblioteca Agroecológica */}
-      <section className="rounded-xl border border-[#DCE5DD] bg-white p-6">
+      <section className="rounded-2xl border border-[#D9E2D7] bg-white p-6 shadow-xs sm:p-8">
         <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#E6EFE7] pb-4">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2.5">
             <BookOpen className="h-5 w-5 text-[#166534]" />
             <div>
-              <h2 className="text-xl font-bold text-[#14241B]">
+              <h2 className="font-display text-2xl font-bold text-[#14241B]">
                 Biblioteca Agroecológica (Caldos, Empaques Seguros y MIP)
               </h2>
-              <p className="text-xs text-[#4B6153]">
+              <p className="mt-0.5 text-xs text-[#4B6153]">
                 Fichas técnicas con nivel de seguridad para estudiantes y trabajo supervisado por el docente.
               </p>
             </div>
@@ -209,21 +209,21 @@ export function CompostLibraryView() {
               value={libSearch}
               onChange={(e) => setLibSearch(e.target.value)}
               placeholder="Buscar caldo, botella, saco, MIP..."
-              className="w-full rounded-lg border border-[#C8D6CB] bg-[#FAFBF9] py-1.5 pl-9 pr-3 text-xs text-[#14241B]"
+              className="w-full rounded-xl border border-[#C8D6CB] bg-[#F5F6F2] py-2 pl-9 pr-3 text-xs text-[#14241B] focus:border-[#14532D] focus:bg-white focus:outline-none"
             />
           </div>
         </div>
 
-        <div className="mt-4 flex flex-wrap gap-1.5">
+        <div className="mt-4 inline-flex flex-wrap gap-1 rounded-xl bg-[#E7ECE5] p-1">
           {categories.map((cat) => (
             <button
               key={cat}
               type="button"
               onClick={() => setLibCategory(cat)}
-              className={`rounded-lg px-3 py-1.5 text-xs font-semibold ${
+              className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition-all duration-150 ${
                 libCategory === cat
-                  ? 'bg-[#14532D] text-white'
-                  : 'border border-[#DCE5DD] bg-[#F7FAF7] text-[#33473B] hover:bg-[#EBF2EC]'
+                  ? 'bg-[#14532D] text-white shadow-xs'
+                  : 'text-[#33473B] hover:bg-white/70 hover:text-[#14241B]'
               }`}
             >
               {cat}
@@ -233,7 +233,7 @@ export function CompostLibraryView() {
 
         <div className="mt-5 grid gap-4 md:grid-cols-2">
           {filteredLibrary.map((card) => (
-            <article key={card.id} className="rounded-xl border border-[#DCE5DD] bg-[#FAFBF9] p-4">
+            <article key={card.id} className="rounded-xl border border-[#D9E2D7] bg-[#FAFBF9] p-5">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <span className="text-[11px] font-bold uppercase tracking-wider text-[#166534]">
                   {card.category}

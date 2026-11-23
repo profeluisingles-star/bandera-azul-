@@ -52,21 +52,21 @@ export function CropsView({ isTeacher, onAddSowing, onOpenAuth }: CropsViewProps
   }
 
   return (
-    <div className="space-y-6">
-      <div className="rounded-xl border border-[#DCE5DD] bg-white p-6">
+    <div className="space-y-8">
+      <section className="rounded-2xl border border-[#D9E2D7] bg-white p-6 shadow-xs sm:p-8">
         <div className="text-xs font-bold uppercase tracking-wider text-[#166534]">
           Guías Agronómicas · Tilarán, Guanacaste
         </div>
-        <h1 className="mt-1 text-2xl font-extrabold text-[#14241B]">
+        <h1 className="font-display mt-1.5 text-2xl font-bold text-[#14241B] sm:text-3xl">
           Cómo cultivar hortalizas en nuestra zona y prevenir enfermedades
         </h1>
-        <p className="mt-1 text-sm text-[#33473B]">
+        <p className="mt-2 max-w-3xl text-sm leading-relaxed text-[#33473B]">
           Selecciona un cultivo para consultar época en Tilarán, distancia, profundidad, manejo del viento alisio y
           prevención de plagas y hongos.
         </p>
 
-        {/* Crop selector buttons */}
-        <div className="mt-4 flex flex-wrap gap-2">
+        {/* Segmented crop selector */}
+        <div className="mt-5 inline-flex flex-wrap gap-1 rounded-xl bg-[#E7ECE5] p-1">
           {TILARAN_CROPS.map((c) => {
             const active = c.id === crop.id;
             return (
@@ -77,10 +77,10 @@ export function CropsView({ isTeacher, onAddSowing, onOpenAuth }: CropsViewProps
                   setSelectedId(c.id);
                   setSavedBanner('');
                 }}
-                className={`rounded-lg px-3.5 py-2 text-xs font-semibold transition-colors ${
+                className={`rounded-lg px-3.5 py-2 text-xs font-semibold transition-all duration-150 ${
                   active
-                    ? 'bg-[#14532D] text-white'
-                    : 'border border-[#DCE5DD] bg-[#F7FAF7] text-[#14241B] hover:bg-[#EBF3EC]'
+                    ? 'bg-[#14532D] text-white shadow-xs'
+                    : 'text-[#33473B] hover:bg-white/70 hover:text-[#14241B]'
                 }`}
               >
                 {c.name}
@@ -88,20 +88,20 @@ export function CropsView({ isTeacher, onAddSowing, onOpenAuth }: CropsViewProps
             );
           })}
         </div>
-      </div>
+      </section>
 
       {/* Selected Crop Detail */}
       <div className="grid gap-6 lg:grid-cols-12">
-        <div className="space-y-5 lg:col-span-8">
-          <div className="rounded-xl border border-[#DCE5DD] bg-white p-6">
+        <div className="space-y-6 lg:col-span-8">
+          <div className="rounded-2xl border border-[#D9E2D7] bg-white p-6 shadow-xs">
             <div className="flex flex-wrap items-start justify-between gap-3 border-b border-[#E6EFE7] pb-4">
               <div>
                 <div className="text-xs font-semibold uppercase tracking-wider text-[#166534]">
                   {crop.family} · <em>{crop.scientific}</em> · Nivel {crop.difficulty}
                 </div>
-                <h2 className="mt-1 text-2xl font-extrabold text-[#14241B]">{crop.name}</h2>
+                <h2 className="font-display mt-1 text-2xl font-bold text-[#14241B] sm:text-3xl">{crop.name}</h2>
               </div>
-              <div className="rounded-lg border border-[#DCE5DD] bg-[#F7FAF7] px-3 py-1.5 text-right">
+              <div className="rounded-xl border border-[#D9E2D7] bg-[#F5F6F2] px-3.5 py-2 text-right">
                 <div className="text-[11px] font-semibold text-[#4B6153]">Cosecha estimada</div>
                 <div className="font-mono text-sm font-bold tabular-nums text-[#14532D]">
                   {crop.harvestDays[0]}–{crop.harvestDays[1]} días
@@ -187,10 +187,10 @@ export function CropsView({ isTeacher, onAddSowing, onOpenAuth }: CropsViewProps
           </div>
 
           {/* Diseases & Prevention */}
-          <div className="rounded-xl border border-[#DCE5DD] bg-white p-6">
-            <div className="flex items-center gap-2 border-b border-[#E6EFE7] pb-3">
+          <div className="rounded-2xl border border-[#D9E2D7] bg-white p-6 shadow-xs">
+            <div className="flex items-center gap-2 border-b border-[#E6EFE7] pb-3.5">
               <ShieldAlert className="h-5 w-5 text-[#D97706]" />
-              <h3 className="text-lg font-bold text-[#14241B]">
+              <h3 className="font-display text-xl font-bold text-[#14241B]">
                 Plagas, síntomas y cómo prevenir en {crop.name}
               </h3>
             </div>
@@ -198,7 +198,7 @@ export function CropsView({ isTeacher, onAddSowing, onOpenAuth }: CropsViewProps
               {crop.diseases.map((dis) => (
                 <div
                   key={dis.name}
-                  className="flex flex-col gap-3 rounded-xl border border-[#E6EFE7] bg-[#FAFBF9] p-3.5 sm:flex-row sm:items-start"
+                  className="flex flex-col gap-3 rounded-xl border border-[#E6EFE7] bg-[#FAFBF9] p-4 sm:flex-row sm:items-start"
                 >
                   <CropSvgDiagram type={dis.diagramType} />
                   <div className="flex-1 text-xs">
@@ -206,7 +206,7 @@ export function CropsView({ isTeacher, onAddSowing, onOpenAuth }: CropsViewProps
                     <p className="mt-1 text-[#4B6153]">
                       <strong className="text-[#14241B]">Síntoma:</strong> {dis.symptom}
                     </p>
-                    <p className="mt-1.5 rounded-lg border border-[#D4E7D7] bg-[#F2F8F3] p-2 text-[#14532D]">
+                    <p className="mt-1.5 rounded-lg border border-[#D4E7D7] bg-[#F2F8F3] p-2.5 text-[#14532D]">
                       <strong>Cómo prevenir y actuar:</strong> {dis.prevention}
                     </p>
                   </div>
@@ -218,8 +218,8 @@ export function CropsView({ isTeacher, onAddSowing, onOpenAuth }: CropsViewProps
 
         {/* Quick Sowing Sidebar */}
         <div className="space-y-4 lg:col-span-4">
-          <div className="rounded-xl border border-[#DCE5DD] bg-white p-5">
-            <h3 className="text-base font-bold text-[#14241B]">Registrar siembra de {crop.name}</h3>
+          <div className="rounded-2xl border border-[#D9E2D7] bg-white p-6 shadow-xs">
+            <h3 className="font-display text-lg font-bold text-[#14241B]">Registrar siembra de {crop.name}</h3>
             <p className="mt-1 text-xs text-[#4B6153]">
               Agrega este cultivo al calendario escolar para calcular tareas de revisión y cosecha.
             </p>

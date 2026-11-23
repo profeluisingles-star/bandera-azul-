@@ -109,21 +109,58 @@ export function LearnLuisitoView({
   }
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="rounded-xl border border-[#DCE5DD] bg-white p-6">
-        <div className="text-xs font-bold uppercase tracking-wider text-[#166534]">
-          Programa Práctico · {settings.locationLabel} · {settings.teacherName}
+    <div className="space-y-8">
+      {/* Split Editorial Header */}
+      <section className="overflow-hidden rounded-2xl border border-[#D9E2D7] bg-white shadow-xs">
+        <div className="grid items-stretch lg:grid-cols-12">
+          <div className="flex flex-col justify-between p-6 sm:p-8 lg:col-span-7">
+            <div>
+              <div className="text-xs font-bold uppercase tracking-wider text-[#166534]">
+                Programa Práctico · {settings.locationLabel} · {settings.teacherName}
+              </div>
+              <h1 className="font-display mt-2 text-2xl font-bold leading-tight text-[#14241B] sm:text-3xl">
+                Aprende con {settings.teacherName}: Agricultura desde cero para Tilarán
+              </h1>
+              <p className="mt-2.5 max-w-2xl text-sm leading-relaxed text-[#33473B]">
+                Ruta paso a paso pensada para estudiantes y principiantes. Aprende cómo diseñar eras resistentes a los{' '}
+                <strong>vientos alisios</strong> y a las <strong>lluvias intensas</strong> de Tilarán, cómo prevenir
+                plagas y cómo llevar una bitácora real de campo.
+              </p>
+            </div>
+            <div className="mt-5 flex flex-wrap items-center gap-4 border-t border-[#E6EFE7] pt-4 text-xs text-[#4B6153]">
+              <div>
+                Progreso practicado:{' '}
+                <strong className="font-mono tabular-nums text-[#14532D]">
+                  {completedSteps.length}/{APRENDE_STEPS.length} pasos
+                </strong>
+              </div>
+              <span aria-hidden="true">·</span>
+              <div>
+                Registros de campo:{' '}
+                <strong className="font-mono tabular-nums text-[#14532D]">{fieldLogs.length}</strong>
+              </div>
+            </div>
+          </div>
+
+          <div className="relative min-h-[220px] bg-[#14241B] lg:col-span-5">
+            <img
+              src="/src/assets/images/aprende_siembra_manos_1795456305998.jpg"
+              alt="Manos estudiantiles trasplantando plántulas de huerta en tierra fértil"
+              referrerPolicy="no-referrer"
+              className="h-full w-full object-cover"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent" />
+            <div className="absolute inset-x-0 bottom-0 p-5 text-white">
+              <div className="text-[11px] font-semibold uppercase tracking-wider text-[#BBF7D0]">
+                Práctica guiada desde cero
+              </div>
+              <div className="mt-0.5 text-sm font-semibold">
+                Observación diaria, acolchado y manejo preventivo en campo
+              </div>
+            </div>
+          </div>
         </div>
-        <h1 className="mt-1 text-2xl font-extrabold text-[#14241B]">
-          Aprende con {settings.teacherName}: Agricultura desde cero para Tilarán
-        </h1>
-        <p className="mt-1.5 max-w-3xl text-sm text-[#33473B]">
-          Ruta paso a paso pensada para estudiantes y principiantes. Aprende cómo diseñar eras resistentes a los{' '}
-          <strong>vientos alisios</strong> y a las <strong>lluvias intensas</strong> de Tilarán, cómo prevenir plagas y
-          cómo llevar una bitácora real de campo.
-        </p>
-      </div>
+      </section>
 
       {/* Interactive 9-step sandbox */}
       <div className="grid gap-6 lg:grid-cols-12">
@@ -170,13 +207,13 @@ export function LearnLuisitoView({
         </div>
 
         {/* Active Step Detail */}
-        <div className="rounded-xl border border-[#DCE5DD] bg-white p-6 lg:col-span-8">
+        <div className="rounded-2xl border border-[#D9E2D7] bg-white p-6 shadow-xs lg:col-span-8">
           <div className="flex flex-wrap items-start justify-between gap-3 border-b border-[#E6EFE7] pb-4">
             <div>
               <div className="font-mono text-xs font-bold uppercase tracking-wider text-[#166534]">
                 Paso {currentStep.step} de {APRENDE_STEPS.length}
               </div>
-              <h2 className="mt-1 text-xl font-bold text-[#14241B]">{currentStep.title}</h2>
+              <h2 className="font-display mt-1 text-2xl font-bold text-[#14241B]">{currentStep.title}</h2>
             </div>
             <button
               type="button"
@@ -247,22 +284,22 @@ export function LearnLuisitoView({
       </div>
 
       {/* Tilaran Seasons Guide */}
-      <div className="grid gap-4 md:grid-cols-2">
+      <div className="grid gap-5 md:grid-cols-2">
         {TILARAN_CLIMATE_PROFILE.seasons.map((season, i) => (
-          <div key={season.name} className="rounded-xl border border-[#DCE5DD] bg-white p-5">
+          <div key={season.name} className="rounded-2xl border border-[#D9E2D7] bg-white p-6 shadow-xs">
             <div className="flex items-center gap-2.5">
               {i === 0 ? (
                 <Wind className="h-5 w-5 text-[#0284C7]" />
               ) : (
                 <CloudRain className="h-5 w-5 text-[#15803D]" />
               )}
-              <h3 className="text-base font-bold text-[#14241B]">{season.name}</h3>
+              <h3 className="font-display text-lg font-bold text-[#14241B]">{season.name}</h3>
             </div>
-            <p className="mt-1.5 text-xs text-[#4B6153]">{season.conditions}</p>
-            <ul className="mt-3 space-y-1.5">
+            <p className="mt-1.5 text-xs leading-relaxed text-[#4B6153]">{season.conditions}</p>
+            <ul className="mt-3.5 space-y-2 border-t border-[#E6EFE7] pt-3.5">
               {season.actions.map((act, idx) => (
                 <li key={idx} className="flex items-start gap-2 text-xs text-[#33473B]">
-                  <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-[#166534]" />
+                  <CheckCircle2 className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#166534]" />
                   <span>{act}</span>
                 </li>
               ))}
@@ -273,16 +310,16 @@ export function LearnLuisitoView({
 
       {/* Bitácora de Campo + Glosario */}
       <div className="grid gap-6 lg:grid-cols-12">
-        <div className="rounded-xl border border-[#DCE5DD] bg-white p-5 lg:col-span-7">
-          <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#E6EFE7] pb-3">
+        <div className="rounded-2xl border border-[#D9E2D7] bg-white p-6 shadow-xs lg:col-span-7">
+          <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#E6EFE7] pb-3.5">
             <div className="flex items-center gap-2">
               <ClipboardList className="h-5 w-5 text-[#166534]" />
-              <h2 className="text-lg font-bold text-[#14241B]">Bitácora de observación en campo</h2>
+              <h2 className="font-display text-xl font-bold text-[#14241B]">Bitácora de observación en campo</h2>
             </div>
             <button
               type="button"
               onClick={handleExportCsv}
-              className="inline-flex items-center gap-1.5 rounded-lg border border-[#C8D6CB] bg-[#F7FAF7] px-3 py-1.5 text-xs font-semibold text-[#14241B] hover:bg-[#EBF3EC]"
+              className="inline-flex items-center gap-1.5 rounded-xl border border-[#C8D6CB] bg-[#F5F6F2] px-3 py-1.5 text-xs font-semibold text-[#14241B] transition-colors hover:bg-[#E7ECE5]"
             >
               <Download className="h-3.5 w-3.5" />
               Descargar CSV
@@ -381,10 +418,10 @@ export function LearnLuisitoView({
         </div>
 
         {/* Glossary */}
-        <div className="rounded-xl border border-[#DCE5DD] bg-white p-5 lg:col-span-5">
-          <div className="flex items-center gap-2 border-b border-[#E6EFE7] pb-3">
+        <div className="rounded-2xl border border-[#D9E2D7] bg-white p-6 shadow-xs lg:col-span-5">
+          <div className="flex items-center gap-2 border-b border-[#E6EFE7] pb-3.5">
             <BookOpen className="h-5 w-5 text-[#166534]" />
-            <h2 className="text-lg font-bold text-[#14241B]">Glosario práctico de huerta</h2>
+            <h2 className="font-display text-xl font-bold text-[#14241B]">Glosario práctico de huerta</h2>
           </div>
           <div className="mt-3 divide-y divide-[#E6EFE7]">
             {GLOSSARY.map((item) => (

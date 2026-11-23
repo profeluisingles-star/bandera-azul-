@@ -227,42 +227,37 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen bg-[#F6F8F5] text-[#14241B]">
+    <div className="min-h-screen bg-[#F5F6F2] text-[#14241B]">
       {/* Single-line 3-Zone Top Bar */}
-      <header className="no-print sticky top-0 z-40 border-b border-[#DCE5DD] bg-white/95 backdrop-blur-sm">
-        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6">
-          {/* Zone 1: Brand & Logos */}
+      <header className="no-print sticky top-0 z-40 border-b border-[#D9E2D7] bg-[#F5F6F2]/95 backdrop-blur-md">
+        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-6 px-4 sm:px-6">
+          {/* Zone 1: Brand & Institutional Logos */}
           <button
             type="button"
             onClick={() => navigateTo('inicio')}
-            className="flex shrink-0 items-center gap-2.5 text-left"
+            className="flex shrink-0 items-center gap-3 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#14532D] rounded-lg"
           >
             <LogoStrip settings={activeSettings} compact />
-            <div className="hidden xl:block">
-              <div className="text-sm font-extrabold leading-tight tracking-tight text-[#14532D]">
-                {activeSettings.enterpriseName}
-              </div>
-              <div className="text-[11px] font-medium text-[#4B6153]">CTP Tronadora · 2027</div>
-            </div>
+            <span className="font-display hidden text-lg font-bold tracking-tight text-[#14532D] whitespace-nowrap xl:inline">
+              {activeSettings.enterpriseName}
+            </span>
           </button>
 
-          {/* Zone 2: Primary Navigation (Desktop) */}
-          <nav className="hidden items-center gap-1 lg:flex" aria-label="Navegación principal">
+          {/* Zone 2: Clean Typographic Navigation (Desktop) */}
+          <nav className="hidden items-center gap-5 lg:flex" aria-label="Navegación principal">
             {navItems.map((item) => {
-              const Icon = item.icon;
               const active = section === item.id;
               return (
                 <button
                   key={item.id}
                   type="button"
                   onClick={() => navigateTo(item.id)}
-                  className={`inline-flex shrink-0 items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-semibold whitespace-nowrap transition-colors ${
+                  className={`relative shrink-0 py-2 text-[13px] font-semibold whitespace-nowrap transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#14532D] ${
                     active
-                      ? 'bg-[#14532D] text-white'
-                      : 'text-[#33473B] hover:bg-[#EDF4EE] hover:text-[#14241B]'
+                      ? 'text-[#14532D] after:absolute after:inset-x-0 after:bottom-0 after:h-0.5 after:bg-[#14532D]'
+                      : 'text-[#4B6153] hover:text-[#14241B]'
                   }`}
                 >
-                  <Icon className="h-3.5 w-3.5" />
                   {item.label}
                 </button>
               );
@@ -270,24 +265,24 @@ export default function App() {
             <button
               type="button"
               onClick={() => navigateTo('docente')}
-              className={`inline-flex shrink-0 items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-semibold whitespace-nowrap transition-colors ${
+              className={`relative inline-flex shrink-0 items-center gap-1.5 py-2 text-[13px] font-semibold whitespace-nowrap transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#14532D] ${
                 section === 'docente'
-                  ? 'bg-[#14532D] text-white'
-                  : 'bg-[#EAF3EC] text-[#14532D] hover:bg-[#DCFCE7]'
+                  ? 'text-[#14532D] after:absolute after:inset-x-0 after:bottom-0 after:h-0.5 after:bg-[#14532D]'
+                  : 'text-[#166534] hover:text-[#14532D]'
               }`}
             >
               {isTeacher ? <ShieldCheck className="h-3.5 w-3.5" /> : <Lock className="h-3.5 w-3.5" />}
-              {isTeacher ? 'Gestión Docente' : 'ECOTRON · Docente'}
+              {isTeacher ? 'Gestión Docente' : 'Docente'}
             </button>
           </nav>
 
-          {/* Zone 3: Teacher Login / Session Action */}
+          {/* Zone 3: Primary Session Action */}
           <div className="flex shrink-0 items-center gap-2">
             {isTeacher ? (
               <button
                 type="button"
                 onClick={handleLogout}
-                className="inline-flex shrink-0 items-center gap-1.5 rounded-lg border border-[#C8D6CB] bg-[#F7FAF7] px-3 py-1.5 text-xs font-semibold whitespace-nowrap text-[#14241B] hover:bg-[#FEE2E2] hover:text-[#991B1B]"
+                className="inline-flex shrink-0 items-center gap-1.5 rounded-lg border border-[#C8D6CB] bg-white px-4 py-2 text-xs font-semibold whitespace-nowrap text-[#14241B] transition-colors duration-150 hover:bg-[#FEE2E2] hover:text-[#991B1B]"
               >
                 <LogOut className="h-3.5 w-3.5" />
                 Cerrar sesión
@@ -296,7 +291,7 @@ export default function App() {
               <button
                 type="button"
                 onClick={() => setAuthModalOpen(true)}
-                className="inline-flex shrink-0 items-center gap-1.5 rounded-lg bg-[#14532D] px-3.5 py-1.5 text-xs font-semibold whitespace-nowrap text-white hover:bg-[#166534]"
+                className="inline-flex shrink-0 items-center gap-1.5 rounded-lg bg-[#14532D] px-4 py-2 text-xs font-semibold whitespace-nowrap text-white shadow-xs transition-colors duration-150 hover:bg-[#166534]"
               >
                 <Lock className="h-3.5 w-3.5" />
                 Iniciar sesión
@@ -306,7 +301,7 @@ export default function App() {
             <button
               type="button"
               onClick={() => setMobileMenuOpen((v) => !v)}
-              className="rounded-lg border border-[#DCE5DD] p-1.5 text-[#14241B] lg:hidden"
+              className="rounded-lg border border-[#D9E2D7] bg-white p-2 text-[#14241B] lg:hidden"
               aria-label="Abrir menú"
             >
               {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
@@ -355,7 +350,7 @@ export default function App() {
       </header>
 
       {/* Main Viewport */}
-      <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6">
+      <main className="mx-auto max-w-7xl px-4 py-7 sm:px-6">
         {loading ? (
           <div className="rounded-xl border border-[#DCE5DD] bg-white p-10 text-center text-sm text-[#4B6153]">
             Cargando plataforma agroecológica ECOTRON · CTP Tronadora...

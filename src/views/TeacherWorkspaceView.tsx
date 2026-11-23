@@ -537,15 +537,15 @@ export function TeacherWorkspaceView({
       : 0;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       {/* Admin Header & Sub-tabs */}
-      <div className="rounded-xl border border-[#DCE5DD] bg-white p-6">
-        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#E6EFE7] pb-4">
+      <div className="rounded-2xl border border-[#D9E2D7] bg-white p-6 shadow-xs sm:p-8">
+        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#E6EFE7] pb-5">
           <div>
             <div className="text-xs font-bold uppercase tracking-wider text-[#166534]">
               Panel Administrativo · Acceso Docente Completo
             </div>
-            <h1 className="mt-1 text-2xl font-extrabold text-[#14241B]">
+            <h1 className="font-display mt-1.5 text-2xl font-bold text-[#14241B] sm:text-3xl">
               Gestión Empresarial {data.settings.enterpriseName} y Plataforma
             </h1>
           </div>
@@ -553,7 +553,7 @@ export function TeacherWorkspaceView({
             <button
               type="button"
               onClick={handleExportSalesCsv}
-              className="inline-flex items-center gap-1.5 rounded-lg border border-[#C8D6CB] bg-[#F7FAF7] px-3 py-1.5 text-xs font-semibold text-[#14241B] hover:bg-[#EBF3EC]"
+              className="inline-flex items-center gap-1.5 rounded-xl border border-[#C8D6CB] bg-[#F5F6F2] px-3.5 py-2 text-xs font-semibold text-[#14241B] transition-colors hover:bg-[#E7ECE5]"
             >
               <FileSpreadsheet className="h-3.5 w-3.5 text-[#166534]" />
               Exportar ventas CSV
@@ -561,7 +561,7 @@ export function TeacherWorkspaceView({
             <button
               type="button"
               onClick={handleDownloadBackup}
-              className="inline-flex items-center gap-1.5 rounded-lg border border-[#C8D6CB] bg-[#F7FAF7] px-3 py-1.5 text-xs font-semibold text-[#14241B] hover:bg-[#EBF3EC]"
+              className="inline-flex items-center gap-1.5 rounded-xl border border-[#C8D6CB] bg-[#F5F6F2] px-3.5 py-2 text-xs font-semibold text-[#14241B] transition-colors hover:bg-[#E7ECE5]"
             >
               <Download className="h-3.5 w-3.5 text-[#166534]" />
               Respaldo JSON
@@ -569,7 +569,7 @@ export function TeacherWorkspaceView({
             <button
               type="button"
               onClick={() => setResetModalOpen(true)}
-              className="inline-flex items-center gap-1.5 rounded-lg border border-[#FCA5A5] bg-[#FEF2F2] px-3 py-1.5 text-xs font-semibold text-[#991B1B] hover:bg-[#FEE2E2]"
+              className="inline-flex items-center gap-1.5 rounded-xl border border-[#FCA5A5] bg-[#FEF2F2] px-3.5 py-2 text-xs font-semibold text-[#991B1B] transition-colors hover:bg-[#FEE2E2]"
             >
               <RotateCcw className="h-3.5 w-3.5" />
               Poner todo en cero
@@ -577,7 +577,7 @@ export function TeacherWorkspaceView({
           </div>
         </div>
 
-        <div className="mt-4 flex flex-wrap gap-1.5">
+        <div className="mt-5 inline-flex flex-wrap gap-1 rounded-xl bg-[#E7ECE5] p-1">
           {(
             [
               { id: 'resumen', label: 'Resumen financiero', icon: BarChart3 },
@@ -595,10 +595,10 @@ export function TeacherWorkspaceView({
                 key={item.id}
                 type="button"
                 onClick={() => setTab(item.id)}
-                className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-xs font-semibold transition-colors ${
+                className={`inline-flex items-center gap-1.5 rounded-lg px-3.5 py-2 text-xs font-semibold transition-all duration-150 ${
                   active
-                    ? 'bg-[#14532D] text-white'
-                    : 'border border-[#DCE5DD] bg-[#F7FAF7] text-[#33473B] hover:bg-[#EBF2EC]'
+                    ? 'bg-[#14532D] text-white shadow-xs'
+                    : 'text-[#33473B] hover:bg-white/70 hover:text-[#14241B]'
                 }`}
               >
                 <Icon className="h-3.5 w-3.5" />
@@ -610,7 +610,7 @@ export function TeacherWorkspaceView({
 
         {notice && (
           <div
-            className={`mt-4 flex items-center justify-between gap-3 rounded-lg border px-4 py-2.5 text-xs font-medium ${
+            className={`mt-4 flex items-center justify-between gap-3 rounded-xl border px-4 py-2.5 text-xs font-medium ${
               notice.kind === 'ok'
                 ? 'border-[#86EFAC] bg-[#F0FDF4] text-[#166534]'
                 : 'border-[#FCA5A5] bg-[#FEF2F2] text-[#991B1B]'
@@ -627,35 +627,35 @@ export function TeacherWorkspaceView({
       {/* TAB 1: Resumen Financiero */}
       {tab === 'resumen' && (
         <div className="space-y-6">
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            <div className="rounded-xl border border-[#DCE5DD] bg-white p-4">
+          <div className="grid divide-y divide-[#E6EFE7] overflow-hidden rounded-2xl border border-[#D9E2D7] bg-white shadow-xs sm:grid-cols-2 sm:divide-x sm:divide-y-0 lg:grid-cols-4">
+            <div className="p-5">
               <div className="text-xs font-semibold uppercase tracking-wider text-[#4B6153]">Ventas acumuladas</div>
-              <div className="mt-1 font-mono text-2xl font-extrabold tabular-nums text-[#14532D]">
+              <div className="mt-1.5 font-mono text-2xl font-extrabold tabular-nums text-[#14532D]">
                 {formatCRC(metrics.totalSales)}
               </div>
               <div className="mt-1 text-xs text-[#4B6153]">{data.sales.length} recibos emitidos</div>
             </div>
-            <div className="rounded-xl border border-[#DCE5DD] bg-white p-4">
+            <div className="p-5">
               <div className="text-xs font-semibold uppercase tracking-wider text-[#4B6153]">Gastos operativos</div>
-              <div className="mt-1 font-mono text-2xl font-extrabold tabular-nums text-[#92400E]">
+              <div className="mt-1.5 font-mono text-2xl font-extrabold tabular-nums text-[#92400E]">
                 {formatCRC(metrics.totalExpenses)}
               </div>
               <div className="mt-1 text-xs text-[#4B6153]">{data.expenses.length} compras registradas</div>
             </div>
-            <div className="rounded-xl border border-[#DCE5DD] bg-white p-4">
+            <div className="p-5">
               <div className="text-xs font-semibold uppercase tracking-wider text-[#4B6153]">
                 Fondo Reinversión ({data.settings.reinvestPercent}%)
               </div>
-              <div className="mt-1 font-mono text-2xl font-extrabold tabular-nums text-[#0284C7]">
+              <div className="mt-1.5 font-mono text-2xl font-extrabold tabular-nums text-[#0284C7]">
                 {formatCRC(metrics.reinvestAmount)}
               </div>
               <div className="mt-1 text-xs text-[#4B6153]">
                 Margen neto: <span className="font-mono tabular-nums">{formatCRC(metrics.netMargin)}</span>
               </div>
             </div>
-            <div className="rounded-xl border border-[#DCE5DD] bg-white p-4">
+            <div className="p-5">
               <div className="text-xs font-semibold uppercase tracking-wider text-[#4B6153]">Valor en inventario</div>
-              <div className="mt-1 font-mono text-2xl font-extrabold tabular-nums text-[#14241B]">
+              <div className="mt-1.5 font-mono text-2xl font-extrabold tabular-nums text-[#14241B]">
                 {formatCRC(metrics.stockValue)}
               </div>
               <div className="mt-1 text-xs text-[#4B6153]">
@@ -665,8 +665,8 @@ export function TeacherWorkspaceView({
           </div>
 
           <div className="grid gap-6 lg:grid-cols-2">
-            <div className="rounded-xl border border-[#DCE5DD] bg-white p-5">
-              <h2 className="text-base font-bold text-[#14241B]">Ingresos por producto</h2>
+            <div className="rounded-2xl border border-[#D9E2D7] bg-white p-6 shadow-xs">
+              <h2 className="font-display text-lg font-bold text-[#14241B]">Ingresos por producto</h2>
               <div className="mt-4 space-y-3">
                 {metrics.topProducts.map(([name, total]) => {
                   const pct = metrics.totalSales > 0 ? Math.round((total / metrics.totalSales) * 100) : 0;

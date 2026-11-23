@@ -2,23 +2,38 @@
 
 @layer base {
   :root {
-    --font-display: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
-    --font-sans: 'DM Sans', system-ui, -apple-system, sans-serif;
+    --font-display: 'Fraunces', Georgia, serif;
+    --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
     --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
   }
 
   body {
     font-family: var(--font-sans);
-    background-color: #F6F8F5;
+    background-color: #F5F6F2;
     color: #14241B;
   }
 
-  h1, h2, h3, h4, .font-display {
+  h1, h2, .font-display {
     font-family: var(--font-display);
+    text-wrap: balance;
+    letter-spacing: -0.015em;
+  }
+
+  h3, h4 {
+    font-family: var(--font-sans);
   }
 
   .font-mono, .tabular-nums {
     font-variant-numeric: tabular-nums;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }
 

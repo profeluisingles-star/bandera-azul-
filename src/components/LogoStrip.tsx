@@ -38,35 +38,35 @@ function LogoImage({
 }
 
 export function LogoStrip({ settings, compact = false }: LogoStripProps) {
-  const boxSize = compact ? 'h-9 w-9 p-1' : 'h-14 w-14 p-1.5';
+  const boxSize = compact ? 'h-9 w-9 p-1' : 'h-12 w-12 p-1.5';
   return (
     <div className="flex items-center gap-2">
       <div
-        className={`${boxSize} shrink-0 overflow-hidden rounded-lg border border-[#DCE5DD] bg-white`}
+        className={`${boxSize} shrink-0 overflow-hidden rounded-xl border border-[#DCE5DD] bg-white shadow-xs`}
         title="Colegio Técnico Profesional de Tronadora"
       >
         <LogoImage src={settings.ctpLogoUrl} alt="Logo CTP Tronadora" fallbackLabel="CTP" />
       </div>
       <div
-        className={`${boxSize} shrink-0 overflow-hidden rounded-lg border border-[#DCE5DD] bg-white`}
+        className={`${boxSize} shrink-0 overflow-hidden rounded-xl border border-[#DCE5DD] bg-white shadow-xs`}
         title="ECOTRON · Empresa Estudiantil Agroecológica"
       >
         <LogoImage src={settings.ecotronLogoUrl} alt="Logo ECOTRON" fallbackLabel="ECO" />
       </div>
       <div
-        className={`${boxSize} shrink-0 overflow-hidden rounded-lg border border-[#DCE5DD] bg-white`}
+        className={`${boxSize} shrink-0 overflow-hidden rounded-xl border border-[#DCE5DD] bg-white shadow-xs`}
         title="Programa Bandera Azul Ecológica"
       >
         <LogoImage src={settings.banderaLogoUrl} alt="Logo Bandera Azul Ecológica" fallbackLabel="BAE" />
       </div>
       {!compact && (
         <div className="hidden pl-2 sm:block">
-          <div className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-[#166534]">
-            <Leaf className="h-3.5 w-3.5" />
+          <div className="flex items-center gap-1.5 text-xs font-semibold text-[#14532D]">
+            <Leaf className="h-3.5 w-3.5 shrink-0" />
             <span>{settings.schoolName}</span>
           </div>
-          <div className="flex items-center gap-1.5 text-xs text-[#4B6153]">
-            <ShieldCheck className="h-3.5 w-3.5 text-[#0284C7]" />
+          <div className="mt-0.5 flex items-center gap-1.5 text-xs text-[#4B6153]">
+            <ShieldCheck className="h-3.5 w-3.5 shrink-0 text-[#0284C7]" />
             <span>{settings.locationLabel}</span>
           </div>
         </div>

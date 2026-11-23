@@ -66,43 +66,54 @@ export function CatalogView({
   return (
     <div className="space-y-6">
       {/* Header & Packaging Highlight */}
-      <div className="rounded-xl border border-[#DCE5DD] bg-white p-6">
-        <div className="flex flex-wrap items-start justify-between gap-4">
-          <div className="max-w-3xl">
-            <div className="text-xs font-bold uppercase tracking-wider text-[#166534]">
+      <div className="overflow-hidden rounded-2xl border border-[#D9E2D7] bg-white shadow-xs">
+        <div className="grid items-stretch lg:grid-cols-12">
+          <div className="p-6 sm:p-8 lg:col-span-8">
+            <div className="text-xs font-semibold text-[#166534]">
               Catálogo Comercial y Fichas Técnicas · {settings.enterpriseName}
             </div>
-            <h1 className="mt-1 text-2xl font-extrabold text-[#14241B]">
-              Productos en Sacos y Botellas Plásticas Reutilizadas
+            <h1 className="font-display mt-1.5 text-2xl font-bold text-[#14241B] sm:text-3xl">
+              Productos en Sacos y Botellas Reutilizadas
             </h1>
-            <p className="mt-1.5 text-sm text-[#33473B]">
-              Catálogo diseñado para aprovechar los <strong>sacos de 10 kg, 25 kg y 45 kg</strong> (lombricompost,
-              bokashi y compost) y las <strong>botellas plásticas limpias y rotuladas</strong> (bioinsecticidas,
-              caldos minerales, biofermentos y macetas circulares).
+            <p className="mt-2 max-w-2xl text-sm leading-relaxed text-[#33473B]">
+              Aprovechamos <strong>sacos de 10 kg, 25 kg y 45 kg</strong> (lombricompost, bokashi y compost) y{' '}
+              <strong>botellas plásticas limpias con triple lavado</strong> (bioinsecticidas, caldos minerales,
+              biofermentos y kits circulares).
             </p>
+
+            <div className="mt-4 flex items-start gap-2.5 rounded-xl border border-[#F3D28A] bg-[#FEF9EC] p-3.5 text-xs text-[#78350F]">
+              <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-[#D97706]" />
+              <span>
+                <strong>Regla Bandera Azul para botellas reutilizadas:</strong> Toda botella debe pasar por triple lavado,
+                secado, <strong>retiro completo de etiquetas de bebidas</strong> y colocación de etiqueta ECOTRON con lote y
+                aviso agrícola.
+              </span>
+            </div>
           </div>
-          <button
-            type="button"
-            onClick={handleExportCatalogHtml}
-            className="inline-flex shrink-0 items-center gap-2 rounded-lg border border-[#C8D6CB] bg-[#F7FAF7] px-3.5 py-2 text-xs font-semibold text-[#14241B] hover:bg-[#EBF3EC]"
-          >
-            <Download className="h-4 w-4 text-[#166534]" />
-            Exportar catálogo HTML
-          </button>
+
+          <div className="relative hidden min-h-[210px] bg-[#EEF2EC] lg:col-span-4 lg:block">
+            <img
+              src="/src/assets/images/empaques_sacos_botellas_1795456305852.jpg"
+              alt="Presentaciones en sacos agrícolas y botellas reutilizadas"
+              referrerPolicy="no-referrer"
+              className="h-full w-full object-cover"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+            <div className="absolute bottom-4 right-4">
+              <button
+                type="button"
+                onClick={handleExportCatalogHtml}
+                className="inline-flex items-center gap-2 rounded-xl bg-white/95 px-3.5 py-2 text-xs font-semibold whitespace-nowrap text-[#14241B] shadow-sm transition-colors hover:bg-white"
+              >
+                <Download className="h-3.5 w-3.5 text-[#14532D]" />
+                Exportar catálogo HTML
+              </button>
+            </div>
+          </div>
         </div>
 
-        <div className="mt-4 flex items-start gap-2.5 rounded-xl border border-[#FCD34D] bg-[#FEF3C7]/55 p-3.5 text-xs text-[#78350F]">
-          <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-[#D97706]" />
-          <span>
-            <strong>Regla Bandera Azul para botellas reutilizadas:</strong> Toda botella plástica debe pasar por triple
-            lavado, secado, <strong>retiro completo de etiquetas de bebidas</strong> y colocación de etiqueta ECOTRON con
-            fecha de lote y aviso de uso agrícola. En productos en ensayo o caldos, verificar normativa MAG/SFE antes de
-            venta masiva externa.
-          </span>
-        </div>
-
-        {/* Search & Filters */}
-        <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        {/* Search & Segmented Filters */}
+        <div className="flex flex-col gap-3 border-t border-[#E7EDE5] bg-[#FAFBF9] px-6 py-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="relative flex-1 sm:max-w-md">
             <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#4B6153]" />
             <input
@@ -110,18 +121,18 @@ export function CatalogView({
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Buscar lombricompost, bokashi, caldo, saco, botella..."
-              className="w-full rounded-lg border border-[#C8D6CB] bg-[#FAFBF9] py-2 pl-9 pr-3 text-sm text-[#14241B] focus:border-[#14532D] focus:bg-white focus:outline-none"
+              className="w-full rounded-xl border border-[#C8D6CB] bg-white py-2 pl-9 pr-3 text-sm text-[#14241B] focus:border-[#14532D] focus:outline-none focus:ring-2 focus:ring-[#14532D]/15"
             />
           </div>
 
-          <div className="flex flex-wrap gap-1.5">
+          <div className="flex flex-wrap items-center gap-1 rounded-xl bg-[#E7ECE5] p-1">
             {(
               [
                 { id: 'todos', label: 'Todos' },
-                { id: 'sacos', label: 'En sacos / Sólidos' },
-                { id: 'botellas', label: 'En botellas / Caldos y líquidos' },
-                { id: 'kits', label: 'Kits circulares' },
-                { id: 'venta', label: 'Habilitados para venta' },
+                { id: 'sacos', label: 'En sacos' },
+                { id: 'botellas', label: 'En botellas' },
+                { id: 'kits', label: 'Kits' },
+                { id: 'venta', label: 'En venta' },
               ] as const
             ).map((btn) => {
               const active = filter === btn.id;
@@ -130,10 +141,10 @@ export function CatalogView({
                   key={btn.id}
                   type="button"
                   onClick={() => setFilter(btn.id)}
-                  className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors ${
+                  className={`rounded-lg px-3 py-1.5 text-xs font-semibold whitespace-nowrap transition-all duration-150 ${
                     active
-                      ? 'bg-[#14532D] text-white'
-                      : 'border border-[#DCE5DD] bg-[#F7FAF7] text-[#33473B] hover:bg-[#EBF2EC]'
+                      ? 'bg-white text-[#14241B] shadow-xs'
+                      : 'text-[#4B6153] hover:text-[#14241B]'
                   }`}
                 >
                   {btn.label}
@@ -146,9 +157,9 @@ export function CatalogView({
 
       {/* Products Grid */}
       {filtered.length === 0 ? (
-        <div className="rounded-xl border border-[#DCE5DD] bg-white p-10 text-center">
+        <div className="rounded-2xl border border-[#D9E2D7] bg-white p-12 text-center">
           <Package className="mx-auto h-9 w-9 text-[#4B6153]" />
-          <p className="mt-2 text-sm font-semibold text-[#14241B]">
+          <p className="mt-2.5 text-sm font-semibold text-[#14241B]">
             No hay productos que coincidan con tu búsqueda.
           </p>
           <button
@@ -157,71 +168,65 @@ export function CatalogView({
               setSearch('');
               setFilter('todos');
             }}
-            className="mt-3 rounded-lg bg-[#14532D] px-4 py-2 text-xs font-semibold text-white"
+            className="mt-4 rounded-xl bg-[#14532D] px-4 py-2 text-xs font-semibold text-white"
           >
             Ver todo el catálogo
           </button>
         </div>
       ) : (
-        <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+        <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
           {filtered.map((product) => {
             const totalStock = totalProductStock(product);
             const pricesList = Object.entries(product.prices || {});
+            const statusText =
+              product.status === 'activo'
+                ? 'Disponible'
+                : product.status === 'ensayo'
+                  ? 'Ensayo escolar'
+                  : 'Validación técnica';
             return (
               <article
                 key={product.id}
-                className="flex flex-col overflow-hidden rounded-xl border border-[#DCE5DD] bg-white"
+                className="group flex flex-col overflow-hidden rounded-2xl border border-[#D9E2D7] bg-white transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md"
               >
-                <div className="relative aspect-[16/10] bg-[#EDF4EE]">
+                <div className="relative aspect-[4/3] bg-[#EEF2EC]">
                   <img
                     src={product.image}
                     alt={product.name}
+                    referrerPolicy="no-referrer"
                     className="h-full w-full object-cover"
                   />
-                  <div className="absolute left-3 top-3">
-                    {product.status === 'activo' && (
-                      <span className="inline-flex items-center gap-1 rounded-md border border-[#86EFAC] bg-[#F0FDF4] px-2 py-1 text-[11px] font-bold text-[#166534]">
-                        <CheckCircle2 className="h-3.5 w-3.5" />
-                        Habilitado para venta
-                      </span>
-                    )}
-                    {product.status === 'ensayo' && (
-                      <span className="inline-flex items-center gap-1 rounded-md border border-[#FCD34D] bg-[#FEF3C7] px-2 py-1 text-[11px] font-bold text-[#92400E]">
-                        <FlaskConical className="h-3.5 w-3.5" />
-                        Ensayo escolar
-                      </span>
-                    )}
-                    {product.status === 'desarrollo' && (
-                      <span className="inline-flex items-center gap-1 rounded-md border border-[#CBD5E1] bg-[#F8FAFC] px-2 py-1 text-[11px] font-bold text-[#334155]">
-                        <Sparkles className="h-3.5 w-3.5" />
-                        Validación técnica
-                      </span>
-                    )}
+                  <div className="absolute inset-x-0 bottom-0 h-14 bg-gradient-to-t from-black/50 to-transparent" />
+                  <div className="absolute bottom-3 left-3 flex items-center gap-1.5 text-xs font-semibold text-white">
+                    {product.status === 'activo' && <CheckCircle2 className="h-3.5 w-3.5 text-[#86EFAC]" />}
+                    {product.status === 'ensayo' && <FlaskConical className="h-3.5 w-3.5 text-[#FDE68A]" />}
+                    {product.status === 'desarrollo' && <Sparkles className="h-3.5 w-3.5 text-[#E2E8F0]" />}
+                    <span>{statusText}</span>
                   </div>
                 </div>
 
-                <div className="flex flex-1 flex-col p-4">
-                  <div className="flex items-center justify-between gap-2 text-[11px] font-bold uppercase tracking-wider text-[#166534]">
+                <div className="flex flex-1 flex-col p-5">
+                  <div className="flex items-center justify-between gap-2 text-xs text-[#4B6153]">
                     <span>
-                      {product.code} · {product.category}
+                      <span className="font-mono font-semibold text-[#14532D]">{product.code}</span>
+                      <span aria-hidden="true"> · </span>
+                      <span>{product.category}</span>
                     </span>
-                    <span className="font-mono tabular-nums text-[#4B6153]">Stock: {totalStock} u.</span>
+                    <span className="font-mono tabular-nums">Stock: {totalStock} u.</span>
                   </div>
 
-                  <h2 className="mt-1 text-lg font-extrabold text-[#14241B]">{product.name}</h2>
-                  <p className="mt-0.5 text-xs font-semibold text-[#166534]">{product.slogan}</p>
+                  <h2 className="font-display mt-1.5 text-xl font-bold text-[#14241B]">{product.name}</h2>
+                  <p className="mt-1 text-xs font-semibold text-[#166534]">{product.slogan}</p>
                   <p className="mt-2 line-clamp-2 text-xs leading-relaxed text-[#4B6153]">{product.purpose}</p>
 
                   {/* Presentations & Prices */}
-                  <div className="mt-3 flex-1 space-y-1.5 border-t border-[#E6EFE7] pt-3">
-                    <div className="text-[11px] font-bold uppercase tracking-wider text-[#4B6153]">
-                      Presentaciones y precios
-                    </div>
-                    <div className="grid grid-cols-2 gap-1.5">
+                  <div className="mt-4 flex-1 space-y-2 border-t border-[#E7EDE5] pt-3.5">
+                    <div className="text-[11px] font-semibold text-[#4B6153]">Presentaciones y precios</div>
+                    <div className="grid grid-cols-2 gap-2">
                       {pricesList.slice(0, 4).map(([pack, price]) => (
                         <div
                           key={pack}
-                          className="rounded-lg border border-[#E6EFE7] bg-[#F8FAF8] px-2.5 py-1.5"
+                          className="rounded-xl border border-[#E7EDE5] bg-[#FAFBF9] px-3 py-2"
                         >
                           <div className="truncate text-[11px] text-[#4B6153]" title={pack}>
                             {pack}
@@ -244,7 +249,7 @@ export function CatalogView({
                     <button
                       type="button"
                       onClick={() => onSelectProduct(product)}
-                      className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-lg bg-[#14532D] px-3 py-2 text-xs font-semibold text-white hover:bg-[#166534]"
+                      className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-[#14532D] px-3.5 py-2.5 text-xs font-semibold whitespace-nowrap text-white transition-colors hover:bg-[#166534]"
                     >
                       <Megaphone className="h-3.5 w-3.5" />
                       Ficha, Afiche y QR

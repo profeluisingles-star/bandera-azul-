@@ -222,19 +222,19 @@ export function SchedulePlanView({
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       {/* Urgent Alarms Panel */}
-      <section className="rounded-xl border border-[#DCE5DD] bg-white p-6">
-        <div className="flex flex-wrap items-start justify-between gap-4 border-b border-[#E6EFE7] pb-4">
+      <section className="rounded-2xl border border-[#D9E2D7] bg-white p-6 shadow-xs sm:p-8">
+        <div className="flex flex-wrap items-start justify-between gap-4 border-b border-[#E6EFE7] pb-5">
           <div className="max-w-2xl">
             <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#166534]">
               <Bell className="h-4 w-4" />
               Calendario Guiado y Alarmas desde Cero
             </div>
-            <h1 className="mt-1 text-2xl font-extrabold text-[#14241B]">
+            <h1 className="font-display mt-1.5 text-2xl font-bold text-[#14241B] sm:text-3xl">
               ¿Cuándo sembrar, regar o aplicar productos en la huerta?
             </h1>
-            <p className="mt-1 text-sm text-[#33473B]">
+            <p className="mt-2 text-sm leading-relaxed text-[#33473B]">
               Cada vez que registras una siembra, la plataforma calcula automáticamente las fechas de{' '}
               <strong>revisión de humedad/riego</strong>, <strong>acolchado</strong>,{' '}
               <strong>trasplante</strong>, <strong>revisión de hojas o aplicación preventiva</strong> y{' '}
@@ -343,11 +343,11 @@ export function SchedulePlanView({
 
       {/* Interactive Monthly Visual Calendar + Selected Day Detail */}
       <section className="grid gap-6 lg:grid-cols-12">
-        <div className="rounded-xl border border-[#DCE5DD] bg-white p-5 lg:col-span-7">
-          <div className="flex items-center justify-between border-b border-[#E6EFE7] pb-3">
+        <div className="rounded-2xl border border-[#D9E2D7] bg-white p-6 shadow-xs lg:col-span-7">
+          <div className="flex items-center justify-between border-b border-[#E6EFE7] pb-3.5">
             <div className="flex items-center gap-2">
               <CalendarIcon className="h-5 w-5 text-[#166534]" />
-              <h2 className="text-lg font-bold text-[#14241B]">
+              <h2 className="font-display text-xl font-bold text-[#14241B]">
                 {MONTH_NAMES[viewMonth]} {viewYear}
               </h2>
             </div>
@@ -413,11 +413,11 @@ export function SchedulePlanView({
                   <span className="font-mono text-xs font-bold text-[#14241B]">{cell.day}</span>
                   {dayEvents.length > 0 && (
                     <div className="flex w-full items-center justify-between gap-1">
-                      <div className="flex items-center gap-0.5">
+                      <div className="flex items-center gap-1">
                         {dayEvents.slice(0, 3).map((ev) => (
                           <span
                             key={ev.id}
-                            className={`h-2 w-2 rounded-full ${
+                            className={`h-1.5 w-3 rounded-xs ${
                               ev.done ? 'bg-[#CBD5E1]' : categoryStyle(ev.category).dot
                             }`}
                           />
@@ -436,28 +436,28 @@ export function SchedulePlanView({
           {/* Legend */}
           <div className="mt-3 flex flex-wrap gap-3 border-t border-[#E6EFE7] pt-3 text-[11px] text-[#4B6153]">
             <span className="inline-flex items-center gap-1.5">
-              <span className="h-2.5 w-2.5 rounded-full bg-[#0284C7]" /> Riego / humedad
+              <span className="h-2 w-3.5 rounded-xs bg-[#0284C7]" /> Riego / humedad
             </span>
             <span className="inline-flex items-center gap-1.5">
-              <span className="h-2.5 w-2.5 rounded-full bg-[#D97706]" /> Producto / abono / MIP
+              <span className="h-2 w-3.5 rounded-xs bg-[#D97706]" /> Producto / abono / MIP
             </span>
             <span className="inline-flex items-center gap-1.5">
-              <span className="h-2.5 w-2.5 rounded-full bg-[#166534]" /> Siembra / trasplante
+              <span className="h-2 w-3.5 rounded-xs bg-[#166534]" /> Siembra / trasplante
             </span>
             <span className="inline-flex items-center gap-1.5">
-              <span className="h-2.5 w-2.5 rounded-full bg-[#15803D]" /> Cosecha
+              <span className="h-2 w-3.5 rounded-xs bg-[#15803D]" /> Cosecha
             </span>
           </div>
         </div>
 
         {/* Selected Day Tasks + Custom Alarm Form */}
         <div className="space-y-4 lg:col-span-5">
-          <div className="rounded-xl border border-[#DCE5DD] bg-white p-5">
+          <div className="rounded-2xl border border-[#D9E2D7] bg-white p-6 shadow-xs">
             <div className="border-b border-[#E6EFE7] pb-3">
               <div className="font-mono text-xs font-bold uppercase tracking-wider text-[#166534]">
                 Actividades del {formatDateCR(selectedDate)}
               </div>
-              <h3 className="text-base font-bold text-[#14241B]">Qué hacer este día (guía paso a paso)</h3>
+              <h3 className="font-display text-lg font-bold text-[#14241B]">Qué hacer este día (guía paso a paso)</h3>
             </div>
 
             <div className="mt-3 space-y-2.5">
@@ -513,8 +513,8 @@ export function SchedulePlanView({
           </div>
 
           {/* Add Custom Reminder */}
-          <div className="rounded-xl border border-[#DCE5DD] bg-white p-5">
-            <h3 className="text-sm font-bold text-[#14241B]">Programar alarma o recordatorio manual</h3>
+          <div className="rounded-2xl border border-[#D9E2D7] bg-white p-6 shadow-xs">
+            <h3 className="font-display text-base font-bold text-[#14241B]">Programar alarma o recordatorio manual</h3>
             {isTeacher ? (
               <form onSubmit={handleCreateReminder} className="mt-3 space-y-2.5 text-xs">
                 <input
@@ -584,8 +584,10 @@ export function SchedulePlanView({
       </section>
 
       {/* Register Sowing + Active Sowings List */}
-      <section className="rounded-xl border border-[#DCE5DD] bg-white p-6">
-        <h2 className="text-lg font-bold text-[#14241B]">Registrar nueva siembra (genera alarmas automáticas)</h2>
+      <section className="rounded-2xl border border-[#D9E2D7] bg-white p-6 shadow-xs sm:p-8">
+        <h2 className="font-display text-xl font-bold text-[#14241B]">
+          Registrar nueva siembra (genera alarmas automáticas)
+        </h2>
         <p className="mt-0.5 text-xs text-[#4B6153]">
           Al elegir un cultivo y fecha de inicio, la plataforma programa automáticamente las revisiones de riego,
           trasplante, monitoreo de plagas y cosecha.
@@ -706,10 +708,10 @@ export function SchedulePlanView({
       </section>
 
       {/* 12-Month Plan 2027 */}
-      <section className="rounded-xl border border-[#DCE5DD] bg-white p-6">
-        <div className="flex items-center gap-2 border-b border-[#E6EFE7] pb-3">
+      <section className="rounded-2xl border border-[#D9E2D7] bg-white p-6 shadow-xs sm:p-8">
+        <div className="flex items-center gap-2 border-b border-[#E6EFE7] pb-3.5">
           <CalendarIcon className="h-5 w-5 text-[#166534]" />
-          <h2 className="text-xl font-bold text-[#14241B]">
+          <h2 className="font-display text-xl font-bold text-[#14241B]">
             Plan Anual Huerta Escolar y ECOTRON (Calendario de Tilarán)
           </h2>
         </div>
