@@ -115,7 +115,9 @@ export function TeacherWorkspaceView({
   const [expAmount, setExpAmount] = useState(0);
   const [expSupplier, setExpSupplier] = useState('');
 
-  // Product editor state
+  // Product editor & inventory filter state
+  const [adminProdFilter, setAdminProdFilter] = useState<'todos' | 'huerta' | 'ecotron'>('todos');
+  const [adminProdSearch, setAdminProdSearch] = useState('');
   const [editProductId, setEditProductId] = useState<string>(
     initialFocusProductId || data.products[0]?.id || ''
   );
@@ -807,7 +809,9 @@ export function TeacherWorkspaceView({
 
             <div className="grid gap-3 sm:grid-cols-2">
               <div>
-                <label className="block text-xs font-semibold text-[#14241B]">Presentación (Saco / Botella)</label>
+                <label className="block text-xs font-semibold text-[#14241B]">
+                  Presentación / Opción (incluye extra)
+                </label>
                 <select
                   value={salePresentation}
                   onChange={(e) => {
@@ -961,7 +965,7 @@ export function TeacherWorkspaceView({
       {/* TAB 3: Productos, Sacos, Botellas y Precios */}
       {tab === 'productos' && (
         <div className="grid gap-6 lg:grid-cols-12">
-          <div className="space-y-2 lg:col-span-4">
+          <div className="space-y-2.5 lg:col-span-4">
             <button
               type="button"
               onClick={startNewProduct}
@@ -970,37 +974,88 @@ export function TeacherWorkspaceView({
               <Plus className="h-4 w-4" />
               Crear nuevo producto
             </button>
-            <div className="space-y-1.5">
-              {data.products.map((p) => {
-                const active = !creatingNewProduct && prodDraft?.id === p.id;
-                return (
+            <div className="rounded-xl border border-[#DCE5DD] bg-[#F8FAF8] p-2.5 space-y-2">
+              <input
+                type="search"
+                value={adminProdSearch}
+                onChange={(e) => setAdminProdSearch(e.target.value)}
+                placeholder="Filtrar por código o nombre (HR-001, culantro...)"
+                className="w-full rounded-lg border border-[#C8D6CB] bg-white px-2.5 py-1.5 text-xs"
+              />
+              <div className="grid grid-cols-3 gap-1 rounded-lg bg-[#E7ECE5] p-0.5 text-[11px] font-semibold">
+                {(
+                  [
+                    { id: 'todos', label: `Todos (${data.products.length})` },
+                    {
+                      id: 'huerta',
+                      label: `Huerta (${data.products.filter((p) => p.id.startsWith('HR-') || p.code.startsWith('HR-')).length})`,
+                    },
+                    {
+                      id: 'ecotron',
+                      label: `ECOTRON (${data.products.filter((p) => !p.id.startsWith('HR-') && !p.code.startsWith('HR-')).length})`,
+                    },
+                  ] as const
+                ).map((opt) => (
                   <button
-                    key={p.id}
+                    key={opt.id}
                     type="button"
-                    onClick={() => {
-                      setCreatingNewProduct(false);
-                      setEditProductId(p.id);
-                    }}
-                    className={`flex w-full items-center gap-3 rounded-xl border px-3 py-2.5 text-left ${
-                      active
-                        ? 'border-[#14532D] bg-[#EAF3EC]'
-                        : 'border-[#DCE5DD] bg-white hover:bg-[#F7FAF7]'
+                    onClick={() => setAdminProdFilter(opt.id)}
+                    className={`rounded-md px-2 py-1 text-center transition-colors ${
+                      adminProdFilter === opt.id
+                        ? 'bg-white text-[#14241B] shadow-xs'
+                        : 'text-[#4B6153] hover:text-[#14241B]'
                     }`}
                   >
-                    <img
-                      src={p.image}
-                      alt={p.name}
-                      className="h-10 w-10 shrink-0 rounded-lg border border-[#DCE5DD] object-cover"
-                    />
-                    <div className="min-w-0 flex-1">
-                      <div className="truncate text-xs font-bold text-[#14241B]">{p.name}</div>
-                      <div className="text-[11px] text-[#4B6153]">
-                        {p.code} · {p.status} · {totalProductStock(p)} u.
-                      </div>
-                    </div>
+                    {opt.label}
                   </button>
-                );
-              })}
+                ))}
+              </div>
+            </div>
+            <div className="max-h-[620px] space-y-1.5 overflow-y-auto pr-0.5">
+              {data.products
+                .filter((p) => {
+                  const isHuerta = p.id.startsWith('HR-') || p.code.startsWith('HR-');
+                  if (adminProdFilter === 'huerta' && !isHuerta) return false;
+                  if (adminProdFilter === 'ecotron' && isHuerta) return false;
+                  const q = adminProdSearch.trim().toLowerCase();
+                  if (!q) return true;
+                  return (
+                    p.name.toLowerCase().includes(q) ||
+                    p.code.toLowerCase().includes(q) ||
+                    p.category.toLowerCase().includes(q)
+                  );
+                })
+                .map((p) => {
+                  const active = !creatingNewProduct && prodDraft?.id === p.id;
+                  return (
+                    <button
+                      key={p.id}
+                      type="button"
+                      onClick={() => {
+                        setCreatingNewProduct(false);
+                        setEditProductId(p.id);
+                      }}
+                      className={`flex w-full items-center gap-3 rounded-xl border px-3 py-2.5 text-left ${
+                        active
+                          ? 'border-[#14532D] bg-[#EAF3EC]'
+                          : 'border-[#DCE5DD] bg-white hover:bg-[#F7FAF7]'
+                      }`}
+                    >
+                      <img
+                        src={p.image}
+                        alt={p.name}
+                        referrerPolicy="no-referrer"
+                        className="h-10 w-10 shrink-0 rounded-lg border border-[#DCE5DD] object-cover"
+                      />
+                      <div className="min-w-0 flex-1">
+                        <div className="truncate text-xs font-bold text-[#14241B]">{p.name}</div>
+                        <div className="font-mono text-[11px] text-[#4B6153]">
+                          {p.code} · {p.status} · {totalProductStock(p)} u.
+                        </div>
+                      </div>
+                    </button>
+                  );
+                })}
             </div>
           </div>
 
@@ -1431,6 +1486,119 @@ export function TeacherWorkspaceView({
                 Registrar lote
               </button>
             </form>
+          </div>
+
+          <div className="rounded-xl border border-[#DCE5DD] bg-white p-5">
+            <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#E6EFE7] pb-3">
+              <div>
+                <h2 className="text-base font-bold text-[#14241B]">
+                  Inventario actual por código SKU ({data.products.length} productos · {metrics.totalUnits} unidades)
+                </h2>
+                <p className="text-xs text-[#4B6153]">
+                  Incluye los 12 productos de Huerta Escolar (<span className="font-mono">HR-001</span> a{' '}
+                  <span className="font-mono">HR-012</span>) y los bioinsumos ECOTRON.
+                </p>
+              </div>
+              <div className="inline-flex rounded-lg bg-[#E7ECE5] p-0.5 text-[11px] font-semibold">
+                {(
+                  [
+                    { id: 'todos', label: 'Todos' },
+                    { id: 'huerta', label: 'Huerta (12)' },
+                    { id: 'ecotron', label: 'ECOTRON' },
+                  ] as const
+                ).map((opt) => (
+                  <button
+                    key={opt.id}
+                    type="button"
+                    onClick={() => setAdminProdFilter(opt.id)}
+                    className={`rounded-md px-2.5 py-1 transition-colors ${
+                      adminProdFilter === opt.id
+                        ? 'bg-white text-[#14241B] shadow-xs'
+                        : 'text-[#4B6153] hover:text-[#14241B]'
+                    }`}
+                  >
+                    {opt.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="mt-3 overflow-x-auto">
+              <table className="w-full min-w-[680px] border-collapse text-left text-xs">
+                <thead>
+                  <tr className="border-b border-[#DCE5DD] bg-[#F7FAF7] text-[11px] font-bold uppercase tracking-wider text-[#4B6153]">
+                    <th className="px-3 py-2">Código</th>
+                    <th className="px-3 py-2">Producto</th>
+                    <th className="px-3 py-2">Presentaciones, precio y existencias</th>
+                    <th className="px-3 py-2 text-right">Stock total</th>
+                    <th className="px-3 py-2 text-right">Acciones</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-[#EDF1EC]">
+                  {data.products
+                    .filter((p) => {
+                      const isHuerta = p.id.startsWith('HR-') || p.code.startsWith('HR-');
+                      if (adminProdFilter === 'huerta' && !isHuerta) return false;
+                      if (adminProdFilter === 'ecotron' && isHuerta) return false;
+                      return true;
+                    })
+                    .map((p) => {
+                      const totalStock = totalProductStock(p);
+                      return (
+                        <tr key={p.id} className="hover:bg-[#FAFBF9]">
+                          <td className="px-3 py-2.5 align-top font-mono font-bold text-[#14532D]">{p.code}</td>
+                          <td className="px-3 py-2.5 align-top">
+                            <div className="font-bold text-[#14241B]">{p.name}</div>
+                            <div className="text-[11px] text-[#4B6153]">
+                              {p.category} · {p.status}
+                            </div>
+                          </td>
+                          <td className="px-3 py-2.5 align-top">
+                            <div className="flex flex-wrap gap-1.5">
+                              {Object.entries(p.prices || {}).map(([pack, price]) => (
+                                <span
+                                  key={pack}
+                                  className="rounded-md border border-[#E2E8E0] bg-[#FAFBF9] px-2 py-0.5 text-[11px] text-[#33473B]"
+                                >
+                                  {pack}: <strong className="font-mono">{formatCRC(price)}</strong> ·{' '}
+                                  <span className="font-mono font-semibold text-[#14532D]">
+                                    {p.stockByPresentation?.[pack] ?? 0} u.
+                                  </span>
+                                </span>
+                              ))}
+                            </div>
+                          </td>
+                          <td className="px-3 py-2.5 text-right align-top font-mono font-bold tabular-nums text-[#14532D]">
+                            {totalStock} u.
+                          </td>
+                          <td className="px-3 py-2.5 text-right align-top whitespace-nowrap">
+                            <div className="inline-flex gap-1.5">
+                              <button
+                                type="button"
+                                onClick={() => setInvProductId(p.id)}
+                                className="rounded-md border border-[#C8D6CB] bg-white px-2 py-1 text-[11px] font-semibold text-[#14241B] hover:bg-[#EAF3EC]"
+                              >
+                                Ajustar stock
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setCreatingNewProduct(false);
+                                  setEditProductId(p.id);
+                                  setTab('productos');
+                                }}
+                                className="rounded-md border border-[#DCE5DD] bg-[#F7FAF7] px-2 py-1 text-[11px] font-semibold text-[#14532D] hover:bg-[#EAF3EC]"
+                              >
+                                Editar
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                </tbody>
+              </table>
+            </div>
           </div>
 
           <div className="rounded-xl border border-[#DCE5DD] bg-white p-5">

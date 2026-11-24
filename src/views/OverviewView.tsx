@@ -225,22 +225,32 @@ export function OverviewView({
           </div>
           <div className="flex flex-1 flex-col justify-between p-6">
             <div>
-              <div className="text-xs font-semibold text-[#166534]">Economía circular estudiantil</div>
+              <div className="text-xs font-semibold text-[#166534]">Especialización en compostaje y sacos</div>
               <h2 className="font-display mt-1.5 text-xl font-bold text-[#14241B]">
-                Sacos y botellas reutilizadas
+                4 líneas de abono orgánico seguro
               </h2>
               <p className="mt-2 text-sm leading-relaxed text-[#4B6153]">
-                Aprovechamos sacos de 10, 25 y 45 kg para abonos sólidos y botellas plásticas con triple lavado y
-                etiqueta técnica para bioles y caldos.
+                Nos especializamos en <strong>compost vegetal maduro</strong>, <strong>lombricompost</strong>,{' '}
+                <strong>compost de boñiga/gallinaza verificada</strong> y <strong>bokashi</strong> en sacos de 10, 25 y
+                45 kg, junto a botellas reutilizadas con triple lavado.
               </p>
             </div>
-            <button
-              type="button"
-              onClick={() => onNavigate('catalogo')}
-              className="mt-5 inline-flex items-center gap-1.5 text-sm font-semibold text-[#14532D] hover:underline"
-            >
-              Ver catálogo completo <ArrowRight className="h-4 w-4" />
-            </button>
+            <div className="mt-5 flex flex-wrap items-center gap-4">
+              <button
+                type="button"
+                onClick={() => onNavigate('compost')}
+                className="inline-flex items-center gap-1.5 text-sm font-semibold text-[#14532D] hover:underline"
+              >
+                Ver guía de compost <ArrowRight className="h-4 w-4" />
+              </button>
+              <button
+                type="button"
+                onClick={() => onNavigate('catalogo')}
+                className="inline-flex items-center gap-1.5 text-sm font-semibold text-[#4B6153] hover:text-[#14532D] hover:underline"
+              >
+                Catálogo
+              </button>
+            </div>
           </div>
         </div>
 
@@ -262,7 +272,15 @@ export function OverviewView({
           </div>
 
           <div className="mt-5 grid gap-3.5 sm:grid-cols-2">
-            {products.slice(0, 6).map((p) => {
+            {(() => {
+              const priorityOrder = ['HR-FLO', 'HR-CUL', 'HR-RAB', 'HR-TRA', 'HR-FER', 'ECO-COM'];
+              const prioritized = priorityOrder
+                .map((id) => products.find((item) => item.id === id))
+                .filter((item): item is Product => Boolean(item));
+              const used = new Set(prioritized.map((item) => item.id));
+              const featured = [...prioritized, ...products.filter((item) => !used.has(item.id))].slice(0, 6);
+              return featured;
+            })().map((p) => {
               const firstEntry = Object.entries(p.prices)[0];
               return (
                 <button

@@ -1,14 +1,29 @@
 import { useMemo, useState } from 'react';
-import { AlertTriangle, BookOpen, Calculator, CheckCircle2, Layers, Search, ShieldAlert } from 'lucide-react';
-import { AGRO_LIBRARY, COMPOST_RECIPES } from '../data/agronomyData.ts';
+import {
+  AlertTriangle,
+  BookOpen,
+  Calculator,
+  CheckCircle2,
+  ExternalLink,
+  Layers,
+  Search,
+  ShieldAlert,
+  Sprout,
+} from 'lucide-react';
+import { AGRO_LIBRARY, COMPOST_RECIPES, COMPOST_SPECIALIZATION } from '../data/agronomyData.ts';
 
 export function CompostLibraryView() {
+  const [selectedCompostId, setSelectedCompostId] =
+    useState<(typeof COMPOST_SPECIALIZATION)[number]['id']>('compost-vegetal');
   const [bedLength, setBedLength] = useState(4);
   const [bedWidth, setBedWidth] = useState(1);
   const [bedCount, setBedCount] = useState(2);
   const [dosePerSqm, setDosePerSqm] = useState(3);
   const [libCategory, setLibCategory] = useState<string>('Todas');
   const [libSearch, setLibSearch] = useState('');
+
+  const activeCompost =
+    COMPOST_SPECIALIZATION.find((c) => c.id === selectedCompostId) || COMPOST_SPECIALIZATION[0];
 
   const calc = useMemo(() => {
     const area = Math.max(0, bedLength) * Math.max(0, bedWidth) * Math.max(1, bedCount);
@@ -35,22 +50,107 @@ export function CompostLibraryView() {
 
   return (
     <div className="space-y-8">
+      {/* Specialization Matrix: 4 Compost Pillars */}
+      <section className="rounded-2xl border border-[#D9E2D7] bg-white p-6 shadow-xs sm:p-8">
+        <div className="flex flex-wrap items-start justify-between gap-4 border-b border-[#E6EFE7] pb-5">
+          <div>
+            <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#166534]">
+              <Sprout className="h-4 w-4" />
+              Especialización ECOTRON en Compostaje y Abonos Orgánicos
+            </div>
+            <h1 className="font-display mt-1.5 text-2xl font-bold text-[#14241B] sm:text-3xl">
+              Nuestros 4 pilares de compostaje para huerta y sacos
+            </h1>
+            <p className="mt-2 max-w-3xl text-sm leading-relaxed text-[#33473B]">
+              Nos especializamos en producir y enseñar cuatro abonos orgánicos seguros adaptados a Tilarán y respaldados
+              por guías técnicas de la <strong>UNED</strong>, la <strong>UCR</strong> y manejo sanitario de alimentos.
+            </p>
+          </div>
+        </div>
+
+        <div className="mt-5 overflow-x-auto">
+          <table className="w-full min-w-[700px] border-collapse text-left text-sm">
+            <thead>
+              <tr className="border-b border-[#D9E2D7] bg-[#F5F6F2] text-xs font-bold uppercase tracking-wider text-[#14241B]">
+                <th className="px-4 py-3">Opción de compost</th>
+                <th className="px-4 py-3">Cómo usarlo en tu huerta</th>
+                <th className="px-4 py-3">Referencia técnica</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-[#E6EFE7]">
+              {COMPOST_SPECIALIZATION.map((item) => (
+                <tr key={item.id} className="align-top transition-colors hover:bg-[#FAFBF9]">
+                  <td className="w-64 px-4 py-4">
+                    <div className="font-bold text-[#14241B]">{item.option}</div>
+                    <div className="mt-1 text-xs font-semibold text-[#166534]">{item.ecotronLine}</div>
+                  </td>
+                  <td className="px-4 py-4 text-xs leading-relaxed text-[#33473B]">
+                    <p>{item.howToUse}</p>
+                    {item.warningNote ? (
+                      <div className="mt-2 flex items-start gap-2 rounded-lg border border-[#FCD34D] bg-[#FEF3C7]/70 px-3 py-2 text-[#78350F]">
+                        <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#D97706]" />
+                        <span>{item.warningNote}</span>
+                      </div>
+                    ) : (
+                      <div className="mt-2 flex items-center gap-1.5 font-medium text-[#166534]">
+                        <CheckCircle2 className="h-3.5 w-3.5 shrink-0" />
+                        <span>{item.safeCropsNote}</span>
+                      </div>
+                    )}
+                  </td>
+                  <td className="w-56 px-4 py-4 text-xs">
+                    <a
+                      href={item.sourceUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1.5 font-semibold text-[#14532D] underline decoration-[#14532D]/40 underline-offset-2 hover:text-[#166534]"
+                    >
+                      <span>{item.sourceLabel}</span>
+                      <ExternalLink className="h-3.5 w-3.5 shrink-0" />
+                    </a>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
       {/* Compost Calculator */}
       <section className="rounded-2xl border border-[#D9E2D7] bg-white p-6 shadow-xs sm:p-8">
         <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#166534]">
           <Calculator className="h-4 w-4" />
           Calculadora de Compost y Sacos para Eras
         </div>
-        <h1 className="font-display mt-1.5 text-2xl font-bold text-[#14241B] sm:text-3xl">
-          Compostaje, Sustratos y Biblioteca Agroecológica
-        </h1>
-        <p className="mt-2 max-w-3xl text-sm leading-relaxed text-[#33473B]">
-          Calcula cuántos kilos y sacos de TierraViva, VermiVida o BokaSuelo necesitas para preparar las eras antes
-          de sembrar.
+        <h2 className="font-display mt-1.5 text-2xl font-bold text-[#14241B]">
+          Calcula kilos y sacos según el tipo de abono
+        </h2>
+        <p className="mt-1.5 max-w-3xl text-sm leading-relaxed text-[#33473B]">
+          Elige el abono que vas a utilizar en tus eras o macetas para estimar los kilos necesarios y la cantidad de
+          sacos de 25 kg o 10 kg.
         </p>
 
         <div className="mt-5 grid gap-5 lg:grid-cols-12">
-          <div className="grid gap-3 sm:grid-cols-2 lg:col-span-7">
+          <div className="grid gap-3.5 sm:grid-cols-2 lg:col-span-7">
+            <div className="sm:col-span-2">
+              <label className="block text-xs font-semibold text-[#14241B]">Tipo de compost especializado</label>
+              <select
+                value={selectedCompostId}
+                onChange={(e) => {
+                  const nextId = e.target.value as (typeof COMPOST_SPECIALIZATION)[number]['id'];
+                  setSelectedCompostId(nextId);
+                  const found = COMPOST_SPECIALIZATION.find((c) => c.id === nextId);
+                  if (found) setDosePerSqm(found.defaultDosePerSqm);
+                }}
+                className="mt-1 w-full rounded-xl border border-[#C8D6CB] bg-white px-3 py-2.5 text-sm font-medium text-[#14241B] focus:border-[#14532D] focus:outline-none"
+              >
+                {COMPOST_SPECIALIZATION.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.option} — {c.ecotronLine}
+                  </option>
+                ))}
+              </select>
+            </div>
             <div>
               <label className="block text-xs font-semibold text-[#14241B]">Largo de cada era (m)</label>
               <input
@@ -59,7 +159,7 @@ export function CompostLibraryView() {
                 step={0.5}
                 value={bedLength}
                 onChange={(e) => setBedLength(Number(e.target.value))}
-                className="mt-1 w-full rounded-lg border border-[#C8D6CB] px-3 py-2 font-mono text-sm text-[#14241B]"
+                className="mt-1 w-full rounded-xl border border-[#C8D6CB] px-3 py-2 font-mono text-sm text-[#14241B] focus:border-[#14532D] focus:outline-none"
               />
             </div>
             <div>
@@ -70,7 +170,7 @@ export function CompostLibraryView() {
                 step={0.1}
                 value={bedWidth}
                 onChange={(e) => setBedWidth(Number(e.target.value))}
-                className="mt-1 w-full rounded-lg border border-[#C8D6CB] px-3 py-2 font-mono text-sm text-[#14241B]"
+                className="mt-1 w-full rounded-xl border border-[#C8D6CB] px-3 py-2 font-mono text-sm text-[#14241B] focus:border-[#14532D] focus:outline-none"
               />
             </div>
             <div>
@@ -81,7 +181,7 @@ export function CompostLibraryView() {
                 step={1}
                 value={bedCount}
                 onChange={(e) => setBedCount(Number(e.target.value))}
-                className="mt-1 w-full rounded-lg border border-[#C8D6CB] px-3 py-2 font-mono text-sm text-[#14241B]"
+                className="mt-1 w-full rounded-xl border border-[#C8D6CB] px-3 py-2 font-mono text-sm text-[#14241B] focus:border-[#14532D] focus:outline-none"
               />
             </div>
             <div>
@@ -89,35 +189,39 @@ export function CompostLibraryView() {
               <select
                 value={dosePerSqm}
                 onChange={(e) => setDosePerSqm(Number(e.target.value))}
-                className="mt-1 w-full rounded-lg border border-[#C8D6CB] bg-white px-3 py-2 text-sm text-[#14241B]"
+                className="mt-1 w-full rounded-xl border border-[#C8D6CB] bg-white px-3 py-2 text-sm text-[#14241B] focus:border-[#14532D] focus:outline-none"
               >
-                <option value={2}>2 kg/m² · Mantenimiento ligero</option>
+                <option value={2}>2 kg/m² · Complemento / macetas</option>
+                <option value={2.5}>2,5 kg/m² · Bokashi previo</option>
                 <option value={3}>3 kg/m² · Preparación estándar</option>
                 <option value={4}>4 kg/m² · Suelo pobre / tomate y chile</option>
               </select>
             </div>
           </div>
 
-          <div className="flex flex-col justify-between rounded-xl border border-[#BFD8C4] bg-[#F2F8F3] p-5 lg:col-span-5">
+          <div className="flex flex-col justify-between rounded-2xl border border-[#BFD8C4] bg-[#F2F8F3] p-5 lg:col-span-5">
             <div>
               <div className="text-xs font-bold uppercase tracking-wider text-[#166534]">
-                Resultado estimado
+                Resultado · {activeCompost.option}
               </div>
               <div className="mt-2 font-mono text-3xl font-extrabold tabular-nums text-[#14532D]">
-                {calc.totalKg} kg de compost
+                {calc.totalKg} kg recomendados
               </div>
               <div className="mt-1 text-xs text-[#33473B]">
                 Superficie total: <strong className="font-mono tabular-nums">{calc.area} m²</strong>
               </div>
+              <p className="mt-2.5 text-xs leading-relaxed text-[#33473B]">
+                {activeCompost.warningNote ? activeCompost.warningNote : activeCompost.safeCropsNote}
+              </p>
             </div>
             <div className="mt-4 grid grid-cols-2 gap-2.5 border-t border-[#C8DEC9] pt-3">
-              <div className="rounded-lg bg-white px-3 py-2">
+              <div className="rounded-xl bg-white px-3 py-2">
                 <div className="text-[11px] text-[#4B6153]">Equivalente en sacos 25 kg</div>
                 <div className="font-mono text-lg font-bold tabular-nums text-[#14241B]">
                   {calc.sacos25} sacos
                 </div>
               </div>
-              <div className="rounded-lg bg-white px-3 py-2">
+              <div className="rounded-xl bg-white px-3 py-2">
                 <div className="text-[11px] text-[#4B6153]">Equivalente en sacos 10 kg</div>
                 <div className="font-mono text-lg font-bold tabular-nums text-[#14241B]">
                   {calc.sacos10} sacos
@@ -132,7 +236,9 @@ export function CompostLibraryView() {
       <section className="space-y-4">
         <div className="flex items-center gap-2 px-1">
           <Layers className="h-5 w-5 text-[#166534]" />
-          <h2 className="font-display text-2xl font-bold text-[#14241B]">Recetas de Compostaje y Sustratos</h2>
+          <h2 className="font-display text-2xl font-bold text-[#14241B]">
+            Recetas y protocolos de nuestros 4 abonos orgánicos
+          </h2>
         </div>
 
         <div className="grid gap-5 md:grid-cols-2">
@@ -146,11 +252,11 @@ export function CompostLibraryView() {
                   <h3 className="mt-0.5 text-lg font-bold text-[#14241B]">{rec.name}</h3>
                 </div>
               </div>
-              <p className="mt-1 text-xs text-[#4B6153]">{rec.bestFor}</p>
+              <p className="mt-1 text-xs leading-relaxed text-[#4B6153]">{rec.bestFor}</p>
 
-              <div className="mt-3 rounded-lg bg-[#F7FAF7] p-3">
+              <div className="mt-3 rounded-xl bg-[#F7FAF7] p-3.5">
                 <div className="text-xs font-bold text-[#14241B]">Materiales base</div>
-                <ul className="mt-1 space-y-1 text-xs text-[#33473B]">
+                <ul className="mt-1.5 space-y-1 text-xs text-[#33473B]">
                   {rec.ingredients.map((ing, i) => (
                     <li key={i}>• {ing}</li>
                   ))}
@@ -159,7 +265,7 @@ export function CompostLibraryView() {
 
               <div className="mt-3">
                 <div className="text-xs font-bold text-[#14241B]">Pasos clave</div>
-                <ol className="mt-1 space-y-1 text-xs text-[#33473B]">
+                <ol className="mt-1.5 space-y-1 text-xs text-[#33473B]">
                   {rec.steps.map((st, i) => (
                     <li key={i}>
                       <span className="font-mono font-bold text-[#14532D]">{i + 1}.</span> {st}
@@ -168,7 +274,7 @@ export function CompostLibraryView() {
                 </ol>
               </div>
 
-              <div className="mt-3 space-y-2 border-t border-[#E6EFE7] pt-3 text-xs">
+              <div className="mt-3.5 space-y-2 border-t border-[#E6EFE7] pt-3 text-xs">
                 <div className="flex items-start gap-1.5 text-[#166534]">
                   <CheckCircle2 className="mt-0.5 h-3.5 w-3.5 shrink-0" />
                   <span>

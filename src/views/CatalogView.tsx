@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import {
   AlertTriangle,
+  ArrowRight,
   CheckCircle2,
   Download,
   Edit3,
@@ -9,7 +10,9 @@ import {
   Package,
   Search,
   Sparkles,
+  Sprout,
 } from 'lucide-react';
+import { HUERTA_STARTER_IDS } from '../data/defaultCatalog.ts';
 import type { PlatformSettings, Product } from '../types.ts';
 import {
   buildStandaloneCatalogHtml,
@@ -26,7 +29,9 @@ interface CatalogViewProps {
   onEditInAdmin: (productId: string) => void;
 }
 
-type CatalogFilter = 'todos' | 'sacos' | 'botellas' | 'kits' | 'venta';
+type CatalogFilter = 'todos' | 'lanzamiento' | 'huerta' | 'sacos' | 'botellas' | 'venta';
+
+const STARTER_SET = new Set<string>(HUERTA_STARTER_IDS);
 
 export function CatalogView({
   products,
@@ -38,13 +43,42 @@ export function CatalogView({
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState<CatalogFilter>('todos');
 
+  const starterProducts = useMemo(
+    () =>
+      products.filter(
+        (p) => STARTER_SET.has(p.id) || p.marketingCategory.toLowerCase().includes('lanzamiento inicial')
+      ),
+    [products]
+  );
+
+  const huertaCatalogProducts = useMemo(
+    () =>
+      products.filter(
+        (p) =>
+          p.id.startsWith('HR-') ||
+          p.code.startsWith('HR-') ||
+          p.marketingCategory.toLowerCase().includes('huerta') ||
+          STARTER_SET.has(p.id)
+      ),
+    [products]
+  );
+
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
     return products.filter((p) => {
-      const packs = Object.keys(p.prices).join(' ').toLowerCase();
+      const packs = Object.keys(p.prices || {}).join(' ').toLowerCase();
+      const isStarter =
+        STARTER_SET.has(p.id) || p.marketingCategory.toLowerCase().includes('lanzamiento inicial');
+      const isHuerta =
+        p.id.startsWith('HR-') ||
+        p.code.startsWith('HR-') ||
+        p.marketingCategory.toLowerCase().includes('huerta') ||
+        isStarter;
+
+      if (filter === 'lanzamiento' && !isStarter) return false;
+      if (filter === 'huerta' && !isHuerta) return false;
       if (filter === 'sacos' && !packs.includes('saco') && p.type !== 'solido') return false;
       if (filter === 'botellas' && !packs.includes('botella') && p.type !== 'liquido') return false;
-      if (filter === 'kits' && p.type !== 'kit') return false;
       if (filter === 'venta' && p.status !== 'activo') return false;
 
       if (!q) return true;
@@ -52,7 +86,10 @@ export function CatalogView({
         p.name.toLowerCase().includes(q) ||
         p.code.toLowerCase().includes(q) ||
         p.category.toLowerCase().includes(q) ||
+        p.marketingCategory.toLowerCase().includes(q) ||
+        p.slogan.toLowerCase().includes(q) ||
         p.purpose.toLowerCase().includes(q) ||
+        p.dose.toLowerCase().includes(q) ||
         packs.includes(q)
       );
     });
@@ -73,12 +110,12 @@ export function CatalogView({
               Catálogo Comercial y Fichas Técnicas · {settings.enterpriseName}
             </div>
             <h1 className="font-display mt-1.5 text-2xl font-bold text-[#14241B] sm:text-3xl">
-              Productos en Sacos y Botellas Reutilizadas
+              Catálogo para la Huerta, Sacos y Botellas Reutilizadas
             </h1>
             <p className="mt-2 max-w-2xl text-sm leading-relaxed text-[#33473B]">
-              Aprovechamos <strong>sacos de 10 kg, 25 kg y 45 kg</strong> (lombricompost, bokashi y compost) y{' '}
-              <strong>botellas plásticas limpias con triple lavado</strong> (bioinsecticidas, caldos minerales,
-              biofermentos y kits circulares).
+              Incluimos los <strong>12 productos de huerta escolar</strong> (con prioridad de arranque en 4 líneas más{' '}
+              <strong>fertilizante líquido extra</strong>) junto a nuestros <strong>sacos de 10, 25 y 45 kg</strong> y{' '}
+              <strong>botellas reutilizadas con triple lavado</strong>.
             </p>
 
             <div className="mt-4 flex items-start gap-2.5 rounded-xl border border-[#F3D28A] bg-[#FEF9EC] p-3.5 text-xs text-[#78350F]">
@@ -112,6 +149,64 @@ export function CatalogView({
           </div>
         </div>
 
+        {/* Starter Launch Spotlight */}
+        {starterProducts.length > 0 && (
+          <div className="border-t border-[#E7EDE5] bg-[#F7FAF7] px-6 py-4">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <div className="flex items-center gap-2 text-xs font-bold text-[#14532D]">
+                <Sprout className="h-4 w-4 text-[#166534]" />
+                <span>
+                  Lanzamiento inicial sugerido: 4 productos estrella + fertilizante líquido como extra
+                </span>
+              </div>
+              <button
+                type="button"
+                onClick={() => setFilter(filter === 'lanzamiento' ? 'todos' : 'lanzamiento')}
+                className="inline-flex items-center gap-1 text-xs font-semibold text-[#14532D] hover:underline"
+              >
+                {filter === 'lanzamiento' ? 'Ver todo el catálogo' : 'Filtrar solo lanzamiento'}
+                <ArrowRight className="h-3.5 w-3.5" />
+              </button>
+            </div>
+
+            <div className="mt-3 grid gap-2.5 sm:grid-cols-2 lg:grid-cols-5">
+              {starterProducts.map((item) => {
+                const firstEntry = Object.entries(item.prices || {})[0];
+                const isExtra = item.id === 'HR-FER';
+                return (
+                  <button
+                    key={item.id}
+                    type="button"
+                    onClick={() => onSelectProduct(item)}
+                    className={`flex flex-col justify-between rounded-xl border p-3 text-left transition-colors hover:border-[#14532D]/50 hover:bg-white ${
+                      isExtra
+                        ? 'border-[#C8DEC9] bg-[#EEF6EF]'
+                        : 'border-[#D9E2D7] bg-white'
+                    }`}
+                  >
+                    <div>
+                      <div className="text-[11px] font-semibold text-[#166534]">
+                        {isExtra ? 'Extra opcional' : item.code}
+                      </div>
+                      <div className="mt-0.5 text-xs font-bold text-[#14241B]">{item.name}</div>
+                    </div>
+                    {firstEntry && (
+                      <div className="mt-2 flex items-baseline justify-between gap-2 border-t border-[#EDF1EC] pt-2">
+                        <span className="truncate text-[11px] text-[#4B6153]">
+                          {isExtra ? 'Individual / Extra' : 'Desde'}
+                        </span>
+                        <span className="font-mono text-xs font-bold tabular-nums text-[#14532D]">
+                          {formatCRC(firstEntry[1])}
+                        </span>
+                      </div>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
         {/* Search & Segmented Filters */}
         <div className="flex flex-col gap-3 border-t border-[#E7EDE5] bg-[#FAFBF9] px-6 py-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="relative flex-1 sm:max-w-md">
@@ -120,7 +215,7 @@ export function CatalogView({
               type="search"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Buscar lombricompost, bokashi, caldo, saco, botella..."
+              placeholder="Buscar mata, culantro, rábano, trasplante, fertilizante, saco..."
               className="w-full rounded-xl border border-[#C8D6CB] bg-white py-2 pl-9 pr-3 text-sm text-[#14241B] focus:border-[#14532D] focus:outline-none focus:ring-2 focus:ring-[#14532D]/15"
             />
           </div>
@@ -129,9 +224,10 @@ export function CatalogView({
             {(
               [
                 { id: 'todos', label: 'Todos' },
+                { id: 'lanzamiento', label: 'Para empezar (4 + extra)' },
+                { id: 'huerta', label: 'Huerta (12)' },
                 { id: 'sacos', label: 'En sacos' },
                 { id: 'botellas', label: 'En botellas' },
-                { id: 'kits', label: 'Kits' },
                 { id: 'venta', label: 'En venta' },
               ] as const
             ).map((btn) => {
@@ -272,6 +368,70 @@ export function CatalogView({
           })}
         </div>
       )}
+
+      {/* Compact 12-Product Huerta Reference Table */}
+      {huertaCatalogProducts.length > 0 && (
+        <section className="overflow-hidden rounded-2xl border border-[#D9E2D7] bg-white shadow-xs">
+          <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#E7EDE5] bg-[#FAFBF9] px-6 py-4">
+            <div>
+              <h2 className="font-display text-lg font-bold text-[#14241B]">
+                Resumen del catálogo de productos para la huerta ({huertaCatalogProducts.length} productos)
+              </h2>
+              <p className="mt-0.5 text-xs text-[#4B6153]">
+                Haz clic en cualquier producto para abrir su ficha técnica o ajustar su precio desde Acceso Docente.
+              </p>
+            </div>
+            <span className="font-mono text-xs font-semibold text-[#14532D]">
+              Inicio sugerido: 4 líneas + Fertilizante extra
+            </span>
+          </div>
+
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[680px] border-collapse text-left text-xs">
+              <thead>
+                <tr className="border-b border-[#E7EDE5] bg-[#F7FAF7] text-[11px] font-bold uppercase tracking-wider text-[#4B6153]">
+                  <th className="px-6 py-3">Producto</th>
+                  <th className="px-4 py-3">Qué incluye</th>
+                  <th className="px-6 py-3 text-right">Precio base</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-[#EDF1EC]">
+                {huertaCatalogProducts.map((item) => {
+                  const firstEntry = Object.entries(item.prices || {})[0];
+                  const isStarter = STARTER_SET.has(item.id);
+                  return (
+                    <tr
+                      key={item.id}
+                      onClick={() => onSelectProduct(item)}
+                      className="cursor-pointer transition-colors hover:bg-[#F5F9F5]"
+                    >
+                      <td className="px-6 py-3.5 align-top">
+                        <div className="font-bold text-[#14241B]">{item.name}</div>
+                        <div className="mt-0.5 font-mono text-[11px] text-[#166534]">
+                          {item.code}
+                          {isStarter ? ' · Lanzamiento inicial' : ''}
+                        </div>
+                      </td>
+                      <td className="px-4 py-3.5 align-top leading-relaxed text-[#33473B]">
+                        {item.purpose}
+                      </td>
+                      <td className="px-6 py-3.5 text-right align-top font-mono font-bold tabular-nums whitespace-nowrap text-[#14532D]">
+                        {firstEntry ? formatCRC(firstEntry[1]) : '—'}
+                        {item.prices && Object.keys(item.prices).length > 1 && (
+                          <div className="mt-0.5 font-sans text-[11px] font-normal text-[#4B6153]">
+                            +{Object.keys(item.prices).length - 1} opción
+                          </div>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </section>
+      )}
     </div>
   );
 }
+

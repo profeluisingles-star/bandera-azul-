@@ -1,4 +1,4 @@
-import { createInitialPlatformData } from '../data/defaultCatalog.ts';
+import { createInitialPlatformData, HUERTA_CATALOG_PRODUCTS } from '../data/defaultCatalog.ts';
 import type {
   AuthStatus,
   Client,
@@ -19,6 +19,7 @@ type BackendMode = 'unknown' | 'server' | 'local';
 
 const LOCAL_DB_KEY = 'ecotron_platform_local_v1';
 const LOCAL_AUTH_KEY = 'ecotron_auth_local_v1';
+const LOCAL_HUERTA_MIGRATION_KEY = 'ecotron_huerta_catalog_v2';
 
 interface LocalAuthRecord {
   salt: string;
@@ -82,11 +83,21 @@ function loadLocalDb(): PlatformData {
     const raw = localStorage.getItem(LOCAL_DB_KEY);
     if (!raw) {
       localStorage.setItem(LOCAL_DB_KEY, JSON.stringify(fallback));
+      localStorage.setItem(LOCAL_HUERTA_MIGRATION_KEY, '1');
       return fallback;
     }
     const parsed = JSON.parse(raw) as Partial<PlatformData>;
-    return {
-      products: Array.isArray(parsed.products) ? parsed.products : fallback.products,
+    let products = Array.isArray(parsed.products) ? parsed.products : fallback.products;
+    if (!localStorage.getItem(LOCAL_HUERTA_MIGRATION_KEY)) {
+      const existingIds = new Set(products.map((p) => p.id));
+      const missingHuerta = HUERTA_CATALOG_PRODUCTS.filter((p) => !existingIds.has(p.id));
+      if (missingHuerta.length > 0) {
+        products = [...missingHuerta, ...products];
+      }
+      localStorage.setItem(LOCAL_HUERTA_MIGRATION_KEY, '1');
+    }
+    const db: PlatformData = {
+      products,
       clients: Array.isArray(parsed.clients) ? parsed.clients : fallback.clients,
       movements: Array.isArray(parsed.movements) ? parsed.movements : fallback.movements,
       sales: Array.isArray(parsed.sales) ? parsed.sales : fallback.sales,
@@ -99,6 +110,8 @@ function loadLocalDb(): PlatformData {
         : fallback.customReminders,
       settings: parsed.settings ? { ...fallback.settings, ...parsed.settings } : fallback.settings,
     };
+    saveLocalDb(db);
+    return db;
   } catch {
     return fallback;
   }

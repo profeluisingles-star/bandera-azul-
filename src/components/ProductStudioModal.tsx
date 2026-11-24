@@ -129,6 +129,7 @@ export function ProductStudioModal({ product, settings, onClose }: ProductStudio
                     <img
                       src={product.image}
                       alt={product.name}
+                      referrerPolicy="no-referrer"
                       className="h-full w-full object-cover"
                     />
                   </div>
@@ -229,6 +230,7 @@ export function ProductStudioModal({ product, settings, onClose }: ProductStudio
                 <img
                   src={product.image}
                   alt={product.name}
+                  referrerPolicy="no-referrer"
                   className="h-full w-full object-cover"
                 />
               </div>
@@ -361,7 +363,13 @@ export function ProductStudioModal({ product, settings, onClose }: ProductStudio
                   <div className="flex items-center justify-between gap-2 border-b border-[#DCE5DD] pb-3">
                     <div className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-[#14532D]">
                       <Tag className="h-4 w-4" />
-                      Modelo de etiqueta ({product.type === 'solido' ? 'Saco' : 'Botella reutilizada'})
+                      Modelo de etiqueta (
+                      {product.type === 'solido'
+                        ? 'Saco / Bolsa'
+                        : product.type === 'kit'
+                          ? 'Maceta / Kit de huerta'
+                          : 'Envase / Botella'}
+                      )
                     </div>
                     <LogoStrip settings={settings} compact />
                   </div>

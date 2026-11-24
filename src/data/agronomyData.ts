@@ -49,6 +49,18 @@ export interface CompostRecipe {
   caution: string;
 }
 
+export interface CompostSpecializationItem {
+  id: 'compost-vegetal' | 'lombricompost' | 'boñiga-gallinaza' | 'bokashi';
+  option: string;
+  ecotronLine: string;
+  howToUse: string;
+  safeCropsNote: string;
+  warningNote?: string;
+  defaultDosePerSqm: number;
+  sourceLabel: string;
+  sourceUrl: string;
+}
+
 export interface AgroLibraryCard {
   id: string;
   category: 'Caldos minerales' | 'Bioinsumos y extractos' | 'Plagas y MIP' | 'Suelos y Tilarán' | 'Empaques seguros';
@@ -267,7 +279,7 @@ export const TILARAN_CROPS: CropGuide[] = [
     sun: 'Sol de mañana; sombra parcial (30 %) en días muy calurosos para retrasar floración',
     soil: 'Suelto, fértil y húmedo pero nunca encharcado',
     water: 'Humedad constante los primeros 12 días para germinar; luego regar al pie sin salpicar tierra sobre las hojas.',
-    nutrition: 'Preparar cama con TierraViva bien maduro antes de sembrar; no aplicar biofermentos crudos sobre hojas de consumo fresco.',
+    nutrition: 'Preparar cama mezclando compost vegetal maduro (TierraViva) en la capa superficial o lombricompost antes de sembrar. Evitar estiércol fresco por contacto de hojas con la tierra.',
     harvestText: 'Cortes de hojas frescas entre 35 y 55 días después de siembra directa.',
     tips: [
       'Partir suavemente las semillas redondas (fruto doble) con un rodillo ligero antes de sembrar para duplicar nacimientos.',
@@ -312,7 +324,7 @@ export const TILARAN_CROPS: CropGuide[] = [
     sun: 'Sombra parcial (50–70 % bajo sarán o árboles claros); el sol directo endurece y amarillea las hojas',
     soil: 'Fértil, rico en materia orgánica y húmedo pero drenado',
     water: 'Mantener humedad pareja sin secar por completo.',
-    nutrition: 'Compost TierraViva o VermiVida en la siembra y refuerzo moderado en la base tras cada corte de hojas.',
+    nutrition: 'Compost vegetal maduro (TierraViva) o lombricompost en la siembra y refuerzo moderado en la base tras cada corte. Evitar estiércol fresco por seguridad alimentaria.',
     harvestText: 'Primera cosecha a los 3–4 meses; luego permite cortes sucesivos cada 45–60 días.',
     tips: [
       'Cortar las espigas florales apenas aparecen para que la planta siga produciendo hojas anchas y tiernas.',
@@ -350,7 +362,7 @@ export const TILARAN_CROPS: CropGuide[] = [
     sun: 'Buena luz solar; en calor extremo agradecerá sombra ligera al mediodía',
     soil: 'Muy suelto, libre de piedras y terrones duros',
     water: 'Riego uniforme y ligero: si pasa sed en verano ventoso se vuelve leñoso, picante y agrietado.',
-    nutrition: 'Baja exigencia: solo compost maduro previo. Demasiado nitrógeno produce mucha hoja y raíz pequeña.',
+    nutrition: 'Mezclar compost vegetal maduro en la capa superficial o poco lombricompost. Evitar estiércol fresco en absoluto, porque el bulbo comestible crece directo en la tierra.',
     harvestText: 'De 24 a 35 días desde siembra. No dejar pasar mucho tiempo en suelo o se ahueca.',
     tips: [
       'Ideal para enseñar siembra directa, raleo y prueba de germinación de compost.',
@@ -434,7 +446,7 @@ export const TILARAN_CROPS: CropGuide[] = [
     sun: 'Sol suave de mañana; sombra parcial si hay mediodía muy intenso',
     soil: 'Suelto, muy fértil y drenado',
     water: 'Humedad constante y ligera al pie, evitando mojar el corazón de la lechuga al caer la tarde.',
-    nutrition: 'Compost TierraViva bien maduro y VermiVida al preparar el sustrato. Evitar lixiviados o abonos frescos por higiene alimentaria.',
+    nutrition: 'Compost vegetal maduro y lombricompost (VermiVida) al preparar la era o maceta. Evitar estiércol fresco y lixiviados sin estabilizar porque las hojas tocan el suelo y reciben salpicaduras.',
     harvestText: '45–65 días desde semilla; cosechar temprano en la mañana para mantener turgencia.',
     tips: [
       'No enterrar el cuello de la plántula al trasplantar para evitar pudrición basal.',
@@ -534,35 +546,88 @@ export const TILARAN_CROPS: CropGuide[] = [
   },
 ];
 
+export const COMPOST_SPECIALIZATION: CompostSpecializationItem[] = [
+  {
+    id: 'compost-vegetal',
+    option: 'Compost vegetal maduro',
+    ecotronLine: 'ECOTRON TierraViva (10, 25 y 45 kg)',
+    howToUse:
+      'Mézclalo con la capa superficial de la tierra antes de sembrar. Se puede hacer con hojas secas, restos vegetales de cocina y podas picadas. Es una buena opción para los cinco cultivos (culantro, rábano, chile, tomate y lechuga).',
+    safeCropsNote: 'Apto para los cinco cultivos principales de la huerta escolar.',
+    defaultDosePerSqm: 3,
+    sourceLabel: 'Guía de compostaje de la UNED',
+    sourceUrl: 'https://revistas.uned.ac.cr/index.php/biocenosis/es/article/download/5082/7222/24523?inline=1',
+  },
+  {
+    id: 'lombricompost',
+    option: 'Lombricompost o humus de lombriz',
+    ecotronLine: 'ECOTRON VermiVida (Bolsas y sacos)',
+    howToUse:
+      'Úsalo como complemento, mezclado con la tierra. Es práctico cuando tienes poco espacio, en almácigos o cuando vas a sembrar en macetas y botellas reutilizadas.',
+    safeCropsNote: 'Ideal en macetas, espacios reducidos, almácigos y los cinco cultivos.',
+    defaultDosePerSqm: 2,
+    sourceLabel: 'Nota técnica de la UCR',
+    sourceUrl:
+      'https://www.cia.ucr.ac.cr/sites/default/files/2021-09/Nota%20tecnica%202_2014%20Elaboracion%20de%20abonos%20organicos%20en%20Costa%20Rica.pdf',
+  },
+  {
+    id: 'boñiga-gallinaza',
+    option: 'Compost de boñiga o gallinaza bien compostada',
+    ecotronLine: 'Lotes con tratamiento térmico verificado',
+    howToUse:
+      'Si consigues un producto cuyo tratamiento puedas verificar, puedes incorporarlo antes de plantar (preferiblemente en tomate o chile con antelación previa).',
+    safeCropsNote: 'Uso previo controlado en tomate y chile únicamente tras compostaje verificado.',
+    warningNote:
+      'Para el rábano, la lechuga y el culantro, evitar el estiércol fresco, porque la parte comestible puede tocar la tierra o recibir salpicaduras.',
+    defaultDosePerSqm: 2,
+    sourceLabel: 'Guía de manejo seguro de abonos de origen animal',
+    sourceUrl: 'https://www.pubs.ext.vt.edu/content/pubs_ext_vt_edu/en/FST/FST-39/FST-39NP.html',
+  },
+  {
+    id: 'bokashi',
+    option: 'Bokashi',
+    ecotronLine: 'ECOTRON BokaSuelo (10, 25 y 45 kg)',
+    howToUse:
+      'Abono orgánico fermentado de liberación rápida y alta actividad microbiana. Mézclalo con la tierra de 7 a 15 días antes de sembrar o trasplantar para nutrir tomate, chile y preparación de eras sin quemar raíces.',
+    safeCropsNote: 'Excelente en preparación previa de eras, tomate, chile y reposición de suelo.',
+    warningNote:
+      'Debe estar frío, seco y reposado en el suelo 7–15 días antes de colocar plántulas o semillas tiernas.',
+    defaultDosePerSqm: 2.5,
+    sourceLabel: 'Nota técnica de abonos orgánicos UCR',
+    sourceUrl:
+      'https://www.cia.ucr.ac.cr/sites/default/files/2021-09/Nota%20tecnica%202_2014%20Elaboracion%20de%20abonos%20organicos%20en%20Costa%20Rica.pdf',
+  },
+];
+
 export const COMPOST_RECIPES: CompostRecipe[] = [
   {
     id: 'compost',
-    name: 'Compost caliente vegetal (TierraViva)',
+    name: 'Compost vegetal maduro (TierraViva)',
     duration: '8 a 12 semanas',
     difficulty: 'Básico',
-    bestFor: 'Preparación de eras altas, siembra de hortalizas y venta en sacos de 10, 25 y 45 kg.',
+    bestFor: 'Mezclar con la capa superficial antes de sembrar; buena opción para los cinco cultivos principales.',
     ingredients: [
-      '2 partes de material seco (hojarasca seca, pasto seco, aserrín sin tratar, cartón picado)',
-      '1 parte de material fresco verde (restos de verdura/fruta del comedor, podas verdes sin semillas)',
+      '2 partes de material seco (hojas secas, pasto seco, aserrín sin tratar, cartón picado)',
+      '1 parte de material fresco verde (restos vegetales de cocina del comedor y podas picadas sin semillas)',
       '10 % tierra fértil o compost maduro como inóculo microbiano',
       'Agua limpia hasta lograr humedad de esponja exprimida',
     ],
     steps: [
       'Colocar una base de ramas delgadas (10 cm) para permitir entrada de aire desde abajo.',
-      'Alternar capas de 15 cm de material seco y 8 cm de material verde húmedo.',
+      'Alternar capas de 15 cm de material seco y 8 cm de restos vegetales picados.',
       'Humedecer cada capa sin encharcar (al apretar un puño debe sentirse húmedo sin escurrir gotas).',
       'Monitorear temperatura y voltear la pila cada 7–10 días para oxigenar el centro.',
-      'Cuando ya no caliente tras el volteo y huela a tierra de bosque, tamizar y ensacar.',
+      'Cuando ya no caliente tras el volteo y huela a tierra de bosque, tamizar y empacar en sacos.',
     ],
     readySign: 'Color café oscuro uniforme, textura suelta, temperatura ambiente y olor agradable a bosque húmedo.',
     caution: 'No agregar carnes, lácteos, aceites de cocina, heces de mascotas ni plantas con enfermedades severas.',
   },
   {
     id: 'lombricompost',
-    name: 'Lombricompost / Humus (VermiVida)',
+    name: 'Lombricompost o humus de lombriz (VermiVida)',
     duration: '6 a 10 semanas tras precompostado',
     difficulty: 'Básico',
-    bestFor: 'Almácigos, trasplantes finos de tomate/chile y sacos premium.',
+    bestFor: 'Complemento mezclado con la tierra; muy práctico en espacios pequeños, macetas y almácigos.',
     ingredients: [
       'Pie de cría de lombriz roja californiana (Eisenia fetida)',
       'Restos vegetales precompostados 15–20 días (fríos y sin fermentación ácida)',
@@ -579,15 +644,35 @@ export const COMPOST_RECIPES: CompostRecipe[] = [
     caution: 'Evitar exceso de cítricos, cebolla o material caliente fresco que queme o ahuyente a las lombrices.',
   },
   {
+    id: 'boniga-gallinaza',
+    name: 'Compost de boñiga o gallinaza bien compostada',
+    duration: '10 a 14 semanas (tratamiento verificado)',
+    difficulty: 'Intermedio',
+    bestFor: 'Incorporar antes de plantar tomate o chile únicamente cuando el compostaje térmico está verificado.',
+    ingredients: [
+      'Boñiga o gallinaza seca de origen conocido (sin residuos veterinarios recientes)',
+      '2 a 3 partes de material rico en carbono (cascarilla de arroz, hojarasca o pasto seco picado)',
+      'Agua limpia y termómetro o varilla metálica para verificar calentamiento de la pila',
+    ],
+    steps: [
+      'Mezclar el estiércol con abundante material seco para evitar malos olores y exceso de amoníaco.',
+      'Mantener fase termofílica controlada (55–65 °C por varios días con volteos) para reducir patógenos y semillas de malezas.',
+      'Completar la fase de maduración hasta que vuelva a temperatura ambiente y pierda olor fuerte.',
+      'Verificar trazabilidad y madurez antes de incorporar al suelo previo a la plantación.',
+    ],
+    readySign: 'Sin olor amoniacal ni a estiércol fresco, frío al tacto, textura terrosa y color marrón oscuro.',
+    caution: 'Para rábano, lechuga y culantro EVITAR estiércol fresco, porque la parte comestible toca la tierra o recibe salpicaduras.',
+  },
+  {
     id: 'bokashi',
-    name: 'Abono fermentado Bokashi (BokaSuelo)',
+    name: 'Bokashi (BokaSuelo fermentado)',
     duration: '15 a 21 días',
     difficulty: 'Intermedio',
-    bestFor: 'Cultivos exigentes (tomate, chile, maíz) aplicado 7–15 días antes de trasplantar.',
+    bestFor: 'Abono rápido de alta fertilidad incorporado 7–15 días antes de trasplantar en eras o sacos productivos.',
     ingredients: [
       '3 sacos de tierra negra cernida o mantillo de bosque',
       '3 sacos de cascarilla/granza de arroz o paja picada fina',
-      '2 sacos de gallinaza seca madura o compost fino (opcional vegetal)',
+      '2 sacos de gallinaza seca madura o compost vegetal fino',
       '1 saco de carbón vegetal molido fino + 1 saco de semolina/salvado de arroz',
       '1–2 litros de melaza disuelta en agua tibia + levadura o microorganismos de montaña',
     ],
@@ -599,27 +684,7 @@ export const COMPOST_RECIPES: CompostRecipe[] = [
       'Dejar secar a la sombra hasta alcanzar temperatura ambiente antes de ensacar.',
     ],
     readySign: 'Color grisáceo/café uniforme, seco al tacto, frío y olor suave a pan o fermento dulce.',
-    caution: 'Nunca dejar que supere 55 °C ni ensacar caliente/húmedo porque se pudre y pierde calidad.',
-  },
-  {
-    id: 'almacigo',
-    name: 'Sustrato limpio para almácigos y botellas PET',
-    duration: 'Preparación inmediata',
-    difficulty: 'Básico',
-    bestFor: 'Bandejas germinadoras y kits Semilla Circular en botellas reutilizadas.',
-    ingredients: [
-      '2 partes de TierraViva (compost muy bien tamizado)',
-      '1 parte de VermiVida (lombricompost fino)',
-      '1 parte de fibra de coco lavada o arena de río lavada/granza quemada para drenaje',
-    ],
-    steps: [
-      'Tamizar todos los componentes con malla fina para eliminar terrones y palitos.',
-      'Mezclar uniformemente en recipiente limpio.',
-      'Humedecer ligeramente antes de llenar bandejas o macetas de botella plástica.',
-      'Sembrar a la profundidad correcta y cubrir con capa fina sin apelmazar.',
-    ],
-    readySign: 'Esponjoso, drena al instante sin encharcar y no forma costra dura al secar.',
-    caution: 'No usar tierra arcillosa pesada sola en botellas o bandejas porque asfixia la germinación.',
+    caution: 'Nunca dejar que supere 55 °C ni aplicar caliente directo sobre raíces recién sembradas.',
   },
 ];
 
@@ -754,18 +819,19 @@ export const AGRO_LIBRARY: AgroLibraryCard[] = [
   {
     id: 'lib-seguridad-alimentaria',
     category: 'Suelos y Tilarán',
-    title: 'Higiene y seguridad en hortalizas de consumo fresco',
+    title: 'Manejo seguro de abonos de origen animal en hortalizas frescas',
     riskLevel: 'Bajo riesgo',
-    summary: 'Normas clave para lechuga, culantro y rábano destinados al comedor estudiantil o familias.',
+    summary: 'Normas sanitarias clave para rábano, lechuga y culantro frente a compost de boñiga o gallinaza.',
     ingredientsOrTools: [
-      'Agua potable para lavado, compost 100 % maduro y herramientas exclusivas limpias',
+      'Compost vegetal maduro (TierraViva), lombricompost (VermiVida), o compost de boñiga/gallinaza con tratamiento térmico verificado',
     ],
     preparationOrMethod: [
-      'Usar exclusivamente compost maduro (TierraViva / VermiVida) en hortalizas de hoja.',
-      'Nunca regar el follaje con lixiviados de compostera ni aguas grises.',
-      'Respetar intervalos de seguridad tras cualquier aplicación botánica o mineral y lavar antes de servir.',
+      'En rábano, lechuga y culantro evitar siempre el estiércol fresco, ya que la parte comestible toca la tierra o recibe salpicaduras.',
+      'Si se usa compost de boñiga o gallinaza bien compostada, verificar que completó fase caliente (55–65 °C) e incorporarlo antes de plantar en cultivos altos como tomate o chile.',
+      'Preferir compost vegetal maduro de hojas secas, restos vegetales de cocina y podas picadas para siembras directas de consumo crudo.',
+      'Lavar siempre todas las hortalizas cosechadas con agua potable antes de servir en el comedor o vender.',
     ],
-    preventionRule: 'La salud de estudiantes y clientes siempre prevalece sobre cualquier ahorro o prisa de cosecha.',
+    preventionRule: 'Ante la menor duda sobre la madurez de una boñiga o gallinaza, no usarla en hortalizas de hoja o raíz comestible.',
   },
 ];
 

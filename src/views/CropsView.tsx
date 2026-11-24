@@ -162,11 +162,18 @@ export function CropsView({ isTeacher, onAddSowing, onOpenAuth }: CropsViewProps
               </div>
             </div>
 
-            <div className="mt-4 rounded-lg border border-[#E6EFE7] bg-[#FAFBF9] p-3.5 text-xs text-[#33473B]">
+            <div className="mt-4 rounded-xl border border-[#E6EFE7] bg-[#FAFBF9] p-4 text-xs text-[#33473B]">
               <div>
-                <strong className="text-[#14241B]">Nutrición recomendada:</strong> {crop.nutrition}
+                <strong className="text-[#14241B]">Nutrición y compost especializado:</strong> {crop.nutrition}
               </div>
-              <div className="mt-1.5">
+              {(['rabano', 'lechuga', 'castilla', 'coyote'].includes(crop.id)) && (
+                <div className="mt-2 rounded-lg border border-[#FCD34D] bg-[#FEF3C7]/70 px-3 py-2 text-[#78350F]">
+                  <strong>Regla de seguridad alimentaria:</strong> En {crop.name.toLowerCase()}, evitar estiércol
+                  fresco porque la parte comestible toca la tierra o recibe salpicaduras; usar compost vegetal maduro
+                  (TierraViva) o lombricompost (VermiVida).
+                </div>
+              )}
+              <div className="mt-2">
                 <strong className="text-[#14241B]">Cosecha:</strong> {crop.harvestText}
               </div>
             </div>

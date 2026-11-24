@@ -246,7 +246,12 @@ function isSafeImageSrc(value: unknown): boolean {
   if (typeof value !== 'string') return false;
   const s = value.trim();
   if (!s) return true;
-  if (s.startsWith('/logos/') || s.startsWith('/products/') || s.startsWith('/assets/')) {
+  if (
+    s.startsWith('/logos/') ||
+    s.startsWith('/products/') ||
+    s.startsWith('/assets/') ||
+    s.startsWith('/src/assets/')
+  ) {
     return true;
   }
   if (/^data:image\/(png|jpeg|jpg|webp|svg\+xml);base64,[A-Za-z0-9+/=]+$/i.test(s) && s.length <= 2_500_000) {
